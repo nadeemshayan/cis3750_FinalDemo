@@ -75,6 +75,183 @@ QUESTIONS = [
         "answer": 0,
         "explanation": "Chain Rule: outer derivative × inner derivative = cos(5x²) · 10x"
     },
+    # Additional questions for expanded bank
+    {
+        "id": "q9",
+        "topic": "Basic Rules",
+        "stem": "What is the derivative of f(x) = 7?",
+        "choices": ["0", "7", "7x", "1"],
+        "answer": 0,
+        "explanation": "The derivative of any constant is 0"
+    },
+    {
+        "id": "q10",
+        "topic": "Basic Rules",
+        "stem": "Find f'(x) if f(x) = 4x⁵ + 2x² - 3x + 1",
+        "choices": ["20x⁴ + 4x - 3", "4x⁴ + 2x - 3", "20x⁴ + 4x", "5x⁴ + 2x - 3"],
+        "answer": 0,
+        "explanation": "Power rule term by term: 4(5x⁴) + 2(2x) - 3(1) + 0 = 20x⁴ + 4x - 3"
+    },
+    {
+        "id": "q11",
+        "topic": "Limit Definition",
+        "stem": "Using the limit definition, f'(x) for f(x) = 3x is:",
+        "choices": ["3", "3x", "x", "0"],
+        "answer": 0,
+        "explanation": "f'(x) = lim(h→0) [3(x+h) - 3x]/h = lim(h→0) 3h/h = 3"
+    },
+    {
+        "id": "q12",
+        "topic": "Product Rule",
+        "stem": "Differentiate: f(x) = x·cos(x)",
+        "choices": ["cos(x) - x·sin(x)", "-x·sin(x)", "cos(x)", "x·cos(x)"],
+        "answer": 0,
+        "explanation": "Product Rule: (x)'·cos(x) + x·(cos x)' = 1·cos(x) + x·(-sin x) = cos(x) - x·sin(x)"
+    },
+    {
+        "id": "q13",
+        "topic": "Chain Rule",
+        "stem": "Find the derivative of f(x) = (2x + 1)⁵",
+        "choices": ["10(2x+1)⁴", "5(2x+1)⁴", "2(2x+1)⁴", "(2x+1)⁴"],
+        "answer": 0,
+        "explanation": "Chain Rule: 5(2x+1)⁴ · 2 = 10(2x+1)⁴"
+    },
+    {
+        "id": "q14",
+        "topic": "Quotient Rule",
+        "stem": "Differentiate: f(x) = x/sin(x)",
+        "choices": ["[sin(x) - x·cos(x)]/sin²(x)", "1/cos(x)", "x/cos(x)", "cos(x)/sin(x)"],
+        "answer": 0,
+        "explanation": "Quotient Rule: [1·sin(x) - x·cos(x)]/sin²(x)"
+    },
+    {
+        "id": "q15",
+        "topic": "Implicit Diff.",
+        "stem": "For xy = 10, find dy/dx",
+        "choices": ["-y/x", "y/x", "-x/y", "10"],
+        "answer": 0,
+        "explanation": "Differentiate: y + x(dy/dx) = 0, so dy/dx = -y/x"
+    },
+    {
+        "id": "q16",
+        "topic": "Applications",
+        "stem": "The position of an object is s(t) = t³ - 6t². Its velocity at t=1 is:",
+        "choices": ["-9", "3", "-5", "-12"],
+        "answer": 0,
+        "explanation": "Velocity v(t) = s'(t) = 3t² - 12t. At t=1: v(1) = 3(1)² - 12(1) = -9"
+    },
+    {
+        "id": "q17",
+        "topic": "Basic Rules",
+        "stem": "Differentiate: f(x) = √x",
+        "choices": ["1/(2√x)", "√x", "2√x", "x/2"],
+        "answer": 0,
+        "explanation": "Rewrite as x^(1/2), then power rule: (1/2)x^(-1/2) = 1/(2√x)"
+    },
+    {
+        "id": "q18",
+        "topic": "Chain Rule",
+        "stem": "Find f'(x) if f(x) = e^(3x)",
+        "choices": ["3e^(3x)", "e^(3x)", "3x·e^(3x)", "e^(3x)/3"],
+        "answer": 0,
+        "explanation": "Chain Rule: e^(3x) · 3 = 3e^(3x)"
+    },
+    {
+        "id": "q19",
+        "topic": "Product Rule",
+        "stem": "Differentiate: f(x) = (2x + 1)(x² - 3)",
+        "choices": ["6x² + 2x - 6", "2x² - 6", "4x", "6x² - 6"],
+        "answer": 0,
+        "explanation": "Product Rule: 2(x²-3) + (2x+1)(2x) = 2x² - 6 + 4x² + 2x = 6x² + 2x - 6"
+    },
+    {
+        "id": "q20",
+        "topic": "Applications",
+        "stem": "To find critical points of f(x), we need:",
+        "choices": ["f'(x) = 0", "f(x) = 0", "f''(x) = 0", "f(x) = f'(x)"],
+        "answer": 0,
+        "explanation": "Critical points occur where the derivative equals zero (horizontal tangent)"
+    },
+    {
+        "id": "q21",
+        "topic": "Quotient Rule",
+        "stem": "Find f'(x) for f(x) = (x² + 1)/(x - 1)",
+        "choices": ["(x² - 2x - 1)/(x-1)²", "(2x)/(x-1)", "x²/(x-1)²", "(x² + 1)/(x-1)²"],
+        "answer": 0,
+        "explanation": "Quotient Rule: [2x(x-1) - (x²+1)(1)]/(x-1)² = (2x²-2x-x²-1)/(x-1)² = (x²-2x-1)/(x-1)²"
+    },
+    {
+        "id": "q22",
+        "topic": "Chain Rule",
+        "stem": "Differentiate: f(x) = ln(x² + 1)",
+        "choices": ["2x/(x²+1)", "1/(x²+1)", "2x", "ln(2x)"],
+        "answer": 0,
+        "explanation": "Chain Rule: 1/(x²+1) · 2x = 2x/(x²+1)"
+    },
+    {
+        "id": "q23",
+        "topic": "Implicit Diff.",
+        "stem": "For x³ + y³ = 6xy, find dy/dx",
+        "choices": ["(2y - x²)/(y² - 2x)", "(x² - 2y)/(2x - y²)", "-x²/y²", "3x²/3y²"],
+        "answer": 0,
+        "explanation": "Differentiate: 3x² + 3y²(dy/dx) = 6y + 6x(dy/dx). Solve: dy/dx = (2y - x²)/(y² - 2x)"
+    },
+    {
+        "id": "q24",
+        "topic": "Basic Rules",
+        "stem": "What is d/dx[x⁻³]?",
+        "choices": ["-3x⁻⁴", "-3x⁻²", "3x⁻⁴", "-x⁻⁴"],
+        "answer": 0,
+        "explanation": "Power rule: -3x^(-4) or -3/x⁴"
+    },
+    {
+        "id": "q25",
+        "topic": "Applications",
+        "stem": "The area of a circle is A = πr². The rate of change of area with respect to radius is:",
+        "choices": ["2πr", "πr²", "πr", "2π"],
+        "answer": 0,
+        "explanation": "dA/dr = d/dr(πr²) = 2πr (circumference!)"
+    },
+    {
+        "id": "q26",
+        "topic": "Product Rule",
+        "stem": "Differentiate: f(x) = x²·ln(x)",
+        "choices": ["2x·ln(x) + x", "x·ln(x)", "2x·ln(x)", "x² + ln(x)"],
+        "answer": 0,
+        "explanation": "Product Rule: 2x·ln(x) + x²·(1/x) = 2x·ln(x) + x"
+    },
+    {
+        "id": "q27",
+        "topic": "Chain Rule",
+        "stem": "Find f'(x) if f(x) = cos(x³)",
+        "choices": ["-3x²·sin(x³)", "sin(x³)", "-sin(x³)", "-x²·sin(x³)"],
+        "answer": 0,
+        "explanation": "Chain Rule: -sin(x³) · 3x² = -3x²·sin(x³)"
+    },
+    {
+        "id": "q28",
+        "topic": "Quotient Rule",
+        "stem": "Differentiate: f(x) = 1/x²",
+        "choices": ["-2/x³", "1/x", "-2x", "-1/x²"],
+        "answer": 0,
+        "explanation": "Can use quotient rule OR rewrite as x⁻²: -2x⁻³ = -2/x³"
+    },
+    {
+        "id": "q29",
+        "topic": "Applications",
+        "stem": "A ladder 10m long leans against a wall. If the bottom slides away at 2 m/s, this is a problem involving:",
+        "choices": ["Related rates", "Optimization", "Linear approximation", "Critical points"],
+        "answer": 0,
+        "explanation": "Related rates problems involve multiple variables changing with respect to time"
+    },
+    {
+        "id": "q30",
+        "topic": "Limit Definition",
+        "stem": "The derivative as a limit represents:",
+        "choices": ["Instantaneous rate of change", "Average rate of change", "Total change", "Indefinite integral"],
+        "answer": 0,
+        "explanation": "The limit definition captures the instantaneous rate of change at a point"
+    },
 ]
 
 
@@ -178,9 +355,12 @@ def main():
         col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 1])
         with col_btn2:
             if st.button("🚀 Start Quiz", type="primary", use_container_width=True):
+                # ML: Randomly select 8 questions from bank of 30 for variety
+                selected_questions = random.sample(QUESTIONS, 8)
+                
                 # Shuffle answers for each question
                 shuffled_questions = []
-                for q in QUESTIONS:
+                for q in selected_questions:
                     shuffled_q = q.copy()
                     choices_with_indices = list(enumerate(q['choices']))
                     random.shuffle(choices_with_indices)
@@ -194,9 +374,9 @@ def main():
                 st.session_state.quiz_started = True
                 st.session_state.quiz_idx = 0
                 st.session_state.quiz_score = 0
-                st.session_state.quiz_responses = [None] * len(QUESTIONS)
+                st.session_state.quiz_responses = [None] * 8  # Always 8 questions
                 st.session_state.quiz_finished = False
-                st.session_state.hints_used = [False] * len(QUESTIONS)
+                st.session_state.hints_used = [False] * 8
                 st.session_state.skipped_questions = []
                 st.rerun()
 

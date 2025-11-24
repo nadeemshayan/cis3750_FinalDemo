@@ -37,6 +37,42 @@ PRACTICE_PROBLEMS = {
             "explanation": "The derivative of any constant is 0",
             "topic": "Constant Rule",
             "difficulty": "easy"
+        },
+        {
+            "id": "bd4",
+            "question": "Differentiate: f(x) = x⁸",
+            "options": ["8x⁷", "x⁷", "8x⁸", "7x⁷"],
+            "correct": 0,
+            "explanation": "Power rule: d/dx(x⁸) = 8x⁷",
+            "topic": "Power Rule",
+            "difficulty": "easy"
+        },
+        {
+            "id": "bd5",
+            "question": "Find f'(x) if f(x) = 6x⁴ - 2x³ + x",
+            "options": ["24x³ - 6x² + 1", "6x³ - 2x²", "24x³ - 6x²", "6x⁴ - 2x³"],
+            "correct": 0,
+            "explanation": "Power rule term by term: 24x³ - 6x² + 1",
+            "topic": "Power Rule",
+            "difficulty": "easy"
+        },
+        {
+            "id": "bd6",
+            "question": "What is d/dx[1/x]?",
+            "options": ["-1/x²", "1/x²", "-x", "1/x"],
+            "correct": 0,
+            "explanation": "Rewrite as x⁻¹: d/dx = -1·x⁻² = -1/x²",
+            "topic": "Power Rule",
+            "difficulty": "medium"
+        },
+        {
+            "id": "bd7",
+            "question": "Differentiate: f(x) = √(x³)",
+            "options": ["(3/2)√x", "3√x", "(3/2)x", "√(3x)"],
+            "correct": 0,
+            "explanation": "Rewrite as x^(3/2): d/dx = (3/2)x^(1/2) = (3/2)√x",
+            "topic": "Power Rule",
+            "difficulty": "medium"
         }
     ],
     "product_quotient": [
@@ -115,6 +151,183 @@ PRACTICE_PROBLEMS = {
             "explanation": "Critical points (maxima/minima) occur where f'(x) = 0",
             "topic": "Optimization",
             "difficulty": "medium"
+        },
+        {
+            "id": "ap3",
+            "question": "The cost function is C(x) = 100 + 50x. What is the marginal cost?",
+            "options": ["50", "100", "50x", "150"],
+            "correct": 0,
+            "explanation": "Marginal cost is C'(x) = 50 (constant marginal cost)",
+            "topic": "Applications",
+            "difficulty": "easy"
+        },
+        {
+            "id": "ap4",
+            "question": "A square's side length increases at 2 cm/s. How fast does its area increase when side = 10 cm?",
+            "options": ["40 cm²/s", "20 cm²/s", "100 cm²/s", "4 cm²/s"],
+            "correct": 0,
+            "explanation": "A = s². dA/dt = 2s(ds/dt) = 2(10)(2) = 40 cm²/s",
+            "topic": "Related Rates",
+            "difficulty": "hard"
+        },
+        {
+            "id": "ap5",
+            "question": "For f(x) = x³ - 3x + 1, where is f'(x) = 0?",
+            "options": ["x = ±1", "x = 0", "x = 1", "x = 3"],
+            "correct": 0,
+            "explanation": "f'(x) = 3x² - 3 = 0, so 3x² = 3, x² = 1, x = ±1",
+            "topic": "Critical Points",
+            "difficulty": "medium"
+        }
+    ],
+    "implicit_differentiation": [
+        {
+            "id": "im1",
+            "question": "For x² + y² = 16, find dy/dx",
+            "options": ["-x/y", "x/y", "-y/x", "2x/2y"],
+            "correct": 0,
+            "explanation": "Differentiate: 2x + 2y(dy/dx) = 0, so dy/dx = -x/y",
+            "topic": "Implicit Diff",
+            "difficulty": "easy"
+        },
+        {
+            "id": "im2",
+            "question": "For x³ + xy + y³ = 0, find dy/dx",
+            "options": ["-(3x² + y)/(x + 3y²)", "(3x² + y)/(x + 3y²)", "-3x²/3y²", "-y/x"],
+            "correct": 0,
+            "explanation": "Differentiate: 3x² + y + x(dy/dx) + 3y²(dy/dx) = 0. Solve for dy/dx",
+            "topic": "Implicit Diff",
+            "difficulty": "hard"
+        },
+        {
+            "id": "im3",
+            "question": "For xy = 1, what is dy/dx?",
+            "options": ["-y/x", "y/x", "-1/x²", "1/x²"],
+            "correct": 0,
+            "explanation": "Differentiate: y + x(dy/dx) = 0, so dy/dx = -y/x",
+            "topic": "Implicit Diff",
+            "difficulty": "easy"
+        },
+        {
+            "id": "im4",
+            "question": "For sin(xy) = x, find dy/dx",
+            "options": ["[1 - y·cos(xy)]/[x·cos(xy)]", "1/cos(xy)", "-sin(xy)", "cos(xy)"],
+            "correct": 0,
+            "explanation": "Differentiate: cos(xy)·[y + x(dy/dx)] = 1. Solve for dy/dx",
+            "topic": "Implicit Diff",
+            "difficulty": "hard"
+        },
+        {
+            "id": "im5",
+            "question": "For x² - y² = 9, find dy/dx",
+            "options": ["x/y", "-x/y", "y/x", "2x/2y"],
+            "correct": 0,
+            "explanation": "Differentiate: 2x - 2y(dy/dx) = 0, so dy/dx = x/y",
+            "topic": "Implicit Diff",
+            "difficulty": "easy"
+        }
+    ],
+    "trigonometric": [
+        {
+            "id": "tr1",
+            "question": "Find d/dx[sin(x)]",
+            "options": ["cos(x)", "-cos(x)", "sin(x)", "-sin(x)"],
+            "correct": 0,
+            "explanation": "The derivative of sin(x) is cos(x)",
+            "topic": "Trig Derivatives",
+            "difficulty": "easy"
+        },
+        {
+            "id": "tr2",
+            "question": "What is d/dx[tan(x)]?",
+            "options": ["sec²(x)", "sec(x)tan(x)", "1/cos²(x)", "Both A and C"],
+            "correct": 3,
+            "explanation": "d/dx[tan(x)] = sec²(x) = 1/cos²(x)",
+            "topic": "Trig Derivatives",
+            "difficulty": "easy"
+        },
+        {
+            "id": "tr3",
+            "question": "Differentiate: f(x) = x·sin(x)",
+            "options": ["sin(x) + x·cos(x)", "x·cos(x)", "cos(x)", "sin(x)"],
+            "correct": 0,
+            "explanation": "Product rule: 1·sin(x) + x·cos(x)",
+            "topic": "Trig Derivatives",
+            "difficulty": "medium"
+        },
+        {
+            "id": "tr4",
+            "question": "Find d/dx[cos(3x)]",
+            "options": ["-3sin(3x)", "sin(3x)", "-sin(3x)", "3cos(3x)"],
+            "correct": 0,
+            "explanation": "Chain rule: -sin(3x)·3 = -3sin(3x)",
+            "topic": "Trig Derivatives",
+            "difficulty": "medium"
+        },
+        {
+            "id": "tr5",
+            "question": "What is d/dx[sin²(x)]?",
+            "options": ["2sin(x)cos(x)", "2sin(x)", "sin(2x)", "Both A and C"],
+            "correct": 3,
+            "explanation": "Chain rule: 2sin(x)·cos(x) = sin(2x)",
+            "topic": "Trig Derivatives",
+            "difficulty": "medium"
+        }
+    ],
+    "exponential_log": [
+        {
+            "id": "el1",
+            "question": "Find d/dx[eˣ]",
+            "options": ["eˣ", "xeˣ⁻¹", "e", "ln(x)"],
+            "correct": 0,
+            "explanation": "The derivative of eˣ is eˣ",
+            "topic": "Exponential",
+            "difficulty": "easy"
+        },
+        {
+            "id": "el2",
+            "question": "What is d/dx[ln(x)]?",
+            "options": ["1/x", "ln(x)", "x", "1"],
+            "correct": 0,
+            "explanation": "The derivative of ln(x) is 1/x",
+            "topic": "Logarithmic",
+            "difficulty": "easy"
+        },
+        {
+            "id": "el3",
+            "question": "Differentiate: f(x) = e^(2x)",
+            "options": ["2e^(2x)", "e^(2x)", "2xe^(2x)", "e^(2x)/2"],
+            "correct": 0,
+            "explanation": "Chain rule: e^(2x)·2 = 2e^(2x)",
+            "topic": "Exponential",
+            "difficulty": "medium"
+        },
+        {
+            "id": "el4",
+            "question": "Find d/dx[ln(x²)]",
+            "options": ["2/x", "1/x²", "2x", "ln(2x)"],
+            "correct": 0,
+            "explanation": "Chain rule: (1/x²)·2x = 2/x, or use log property: ln(x²) = 2ln(x), d/dx = 2/x",
+            "topic": "Logarithmic",
+            "difficulty": "medium"
+        },
+        {
+            "id": "el5",
+            "question": "Differentiate: f(x) = x·eˣ",
+            "options": ["eˣ(1 + x)", "xeˣ", "eˣ", "(1+x)eˣ⁻¹"],
+            "correct": 0,
+            "explanation": "Product rule: 1·eˣ + x·eˣ = eˣ(1 + x)",
+            "topic": "Exponential",
+            "difficulty": "medium"
+        },
+        {
+            "id": "el6",
+            "question": "What is d/dx[ln(sin(x))]?",
+            "options": ["cot(x)", "1/sin(x)", "cos(x)/sin(x)", "Both A and C"],
+            "correct": 3,
+            "explanation": "Chain rule: (1/sin(x))·cos(x) = cos(x)/sin(x) = cot(x)",
+            "topic": "Logarithmic",
+            "difficulty": "hard"
         }
     ]
 }
