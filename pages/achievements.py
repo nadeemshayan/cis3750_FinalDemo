@@ -113,6 +113,18 @@ def check_and_award_badges(username: str):
     new_badges = []
     
     # Check each badge condition
+    # Welcome Aboard (should already be awarded at registration, but check anyway)
+    if "Welcome Aboard! 👋" not in earned_badges:
+        DataManager.award_badge(username, "Welcome Aboard! 👋", "Created your account and logged in")
+        new_badges.append("Welcome Aboard! 👋")
+    
+    # Quiz Starter - completed initial quiz
+    if "Quiz Starter 📝" not in earned_badges:
+        quiz_completed = progress.get('initial_quiz', {}).get('completed', False)
+        if quiz_completed:
+            DataManager.award_badge(username, "Quiz Starter 📝", "Completed initial quiz")
+            new_badges.append("Quiz Starter 📝")
+    
     # Quiz Master
     if "Quiz Master 🎯" not in earned_badges:
         quiz_score = progress.get('initial_quiz', {}).get('score', 0)

@@ -96,11 +96,13 @@ def render():
     
     with col1:
         st.markdown("### 🎯 Current Focus")
-        weak_topics = progress.get('weak_topics', [])
-        if weak_topics:
-            st.info(f"Work on: {', '.join(weak_topics[:3])}")
+        weak_topics = progress.get('initial_quiz', {}).get('weak_topics', [])
+        if quiz_completed and weak_topics:
+            st.info(f"📌 Work on: {', '.join(weak_topics[:3])}")
+        elif quiz_completed:
+            st.success("🎯 Great job! No weak areas identified!")
         else:
-            st.success("Great job! Keep practicing!")
+            st.warning("📝 Take the Initial Quiz to identify focus areas")
     
     with col2:
         st.markdown("### 🔥 Streak")

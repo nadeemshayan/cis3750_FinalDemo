@@ -205,6 +205,15 @@ class DataManager:
     def save_quiz_results(username: str, quiz_type: str, score: int, total: int, 
                          weak_topics: List[str], strong_topics: List[str]):
         """Save quiz results"""
+        # Use Supabase if available
+        if USE_SUPABASE:
+            try:
+                SupabaseDataManager.save_quiz_results(username, quiz_type, score, total, weak_topics, strong_topics)
+                print(f"✅ Saved to Supabase: {username} - {quiz_type}")
+            except Exception as e:
+                print(f"⚠️ Supabase save failed: {e}, falling back to JSON")
+        
+        # JSON fallback (always save to JSON too for safety)
         progress = DataManager._load_json(PROGRESS_FILE)
         if username not in progress:
             DataManager.init_user_progress(username)
@@ -225,6 +234,7 @@ class DataManager:
             progress[username]["lesson_quizzes"][quiz_type] = quiz_data
         
         DataManager._save_json(PROGRESS_FILE, progress)
+        print(f"✅ Saved to JSON: {username} - Quiz completed: {quiz_data['completed']}")
     
     @staticmethod
     def save_lesson_progress(username: str, lesson_id: str, completed: bool, time_spent: int):
