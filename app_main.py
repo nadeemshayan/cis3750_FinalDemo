@@ -289,6 +289,10 @@ def route_to_page():
         from pages import achievements
         achievements.main()
     
+    elif page == "settings":
+        from pages import settings
+        settings.main()
+    
     else:
         st.error(f"Page '{page}' not found")
 

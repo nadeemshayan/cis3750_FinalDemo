@@ -108,6 +108,11 @@ def render_sidebar():
         
         st.markdown("---")
         
+        # Settings button
+        if st.button("⚙️ Settings", key="sidebar_settings", use_container_width=True):
+            st.session_state.current_page = "settings"
+            st.rerun()
+        
         # Logout
         if st.button("🚪 Logout", key="sidebar_logout", use_container_width=True):
             for key in list(st.session_state.keys()):
