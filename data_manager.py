@@ -273,21 +273,115 @@ class DataManager:
             DataManager._save_json(PROGRESS_FILE, progress)
     
     @staticmethod
-    def award_certificate(username: str, cert_name: str, course: str):
+    def award_certificate(username: str, cert_name: str, cert_description: str):
         """Award a certificate to user"""
         progress = DataManager._load_json(PROGRESS_FILE)
         if username not in progress:
             DataManager.init_user_progress(username)
             progress = DataManager._load_json(PROGRESS_FILE)
         
-        certificate = {
+        cert = {
             "name": cert_name,
-            "course": course,
+            "description": cert_description,
             "date": datetime.now().isoformat()
         }
         
-        progress[username]["certificates"].append(certificate)
-        DataManager._save_json(PROGRESS_FILE, progress)
+        if cert not in progress[username]["certificates"]:
+            progress[username]["certificates"].append(cert)
+            DataManager._save_json(PROGRESS_FILE, progress)
+    
+    @staticmethod
+    def link_student_to_teacher(student_username: str, teacher_code: str) -> tuple:
+        """
+        Link a student to a teacher's class using teacher code
+        Returns: (success: bool, message: str)
+        """
+        users = DataManager._load_json(USERS_FILE)
+        
+        # Check if student exists
+        if student_username not in users:
+            return False, "Student account not found"
+        
+        # Find teacher with this code
+        teacher_username = None
+        for username, user_data in users.items():
+            if user_data.get('teacher_code') == teacher_code:
+                teacher_username = username
+                break
+        
+        if not teacher_username:
+            return False, f"Teacher with code '{teacher_code}' not found"
+        
+        # Add teacher code to student's list
+        if 'teacher_codes' not in users[student_username]:
+            users[student_username]['teacher_codes'] = []
+        
+        if teacher_code in users[student_username]['teacher_codes']:
+            return False, "Already enrolled in this class"
+        
+        users[student_username]['teacher_codes'].append(teacher_code)
+        
+        # Add student to teacher's class list (if field exists)
+        if 'students' not in users[teacher_username]:
+            users[teacher_username]['students'] = []
+        
+        if student_username not in users[teacher_username]['students']:
+            users[teacher_username]['students'].append(student_username)
+        
+        DataManager._save_json(USERS_FILE, users)
+        print(f"✅ Linked {student_username} to teacher {teacher_username} (code: {teacher_code})")
+        
+        return True, f"Successfully joined {teacher_username}'s class!"
+    
+    @staticmethod
+    def link_parent_to_child(parent_username: str, child_share_code: str) -> tuple:
+        """
+        Link a parent to their child's account using share code
+        Returns: (success: bool, message: str)
+        """
+        users = DataManager._load_json(USERS_FILE)
+        
+        # Check if parent exists
+        if parent_username not in users:
+            return False, "Parent account not found"
+        
+        # Find child with this share code
+        child_username = None
+        for username, user_data in users.items():
+            if user_data.get('share_code') == child_share_code:
+                child_username = username
+                break
+        
+        if not child_username:
+            return False, f"Student with share code '{child_share_code}' not found"
+        
+        # Add child to parent's list
+        if 'children' not in users[parent_username]:
+            users[parent_username]['children'] = []
+        
+        if child_username in users[parent_username]['children']:
+            return False, "Child already linked"
+        
+        users[parent_username]['children'].append(child_username)
+        
+        # Add parent code to child's list
+        if 'parent_codes' not in users[child_username]:
+            users[child_username]['parent_codes'] = []
+        
+        if parent_username not in users[child_username]['parent_codes']:
+            users[child_username]['parent_codes'].append(parent_username)
+        
+        DataManager._save_json(USERS_FILE, users)
+        print(f"✅ Linked {parent_username} to child {child_username} (code: {child_share_code})")
+        
+        return True, f"Successfully linked to {child_username}!"
+    
+    @staticmethod
+    def get_teacher_students(teacher_username: str) -> List[str]:
+        """Get list of students enrolled in teacher's class"""
+        users = DataManager._load_json(USERS_FILE)
+        teacher_data = users.get(teacher_username, {})
+        return teacher_data.get('students', [])
     
     @staticmethod
     def get_all_students() -> List[str]:

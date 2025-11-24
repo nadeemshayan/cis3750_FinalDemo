@@ -150,13 +150,16 @@ def render():
             
             if st.form_submit_button("🎓 Join Class", use_container_width=True):
                 if teacher_code_input:
-                    # In production: DataManager.link_student_to_teacher(username, teacher_code_input)
                     with st.spinner("Joining class..."):
-                        # Check if teacher code exists
-                        # Add student to teacher's class list
-                        # Add teacher code to student's teacher_codes
-                        st.success(f"✅ Successfully joined class: {teacher_code_input}!")
-                        st.info("💡 Feature: Teacher linking - refresh to update")
-                        st.balloons()
+                        success, message = DataManager.link_student_to_teacher(
+                            st.session_state.username, 
+                            teacher_code_input
+                        )
+                        if success:
+                            st.success(f"✅ {message}")
+                            st.balloons()
+                            st.info("Refresh the page to see your updated class list!")
+                        else:
+                            st.error(f"❌ {message}")
                 else:
                     st.error("Please enter a teacher code")

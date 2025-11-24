@@ -89,11 +89,17 @@ def render():
         with col2:
             if st.button("Connect", use_container_width=True):
                 if child_code:
-                    # Find user with this share code
-                    # In production, DataManager.find_user_by_share_code(child_code)
                     with st.spinner("Connecting..."):
-                        st.success(f"✅ Child account '{child_code}' connected!")
-                        st.info("💡 Feature: Link child by share code - refresh to see")
+                        success, message = DataManager.link_parent_to_child(
+                            username,
+                            child_code
+                        )
+                        if success:
+                            st.success(f"✅ {message}")
+                            st.balloons()
+                            st.info("Refresh the page to see your child's progress!")
+                        else:
+                            st.error(f"❌ {message}")
                 else:
                     st.error("Please enter a share code")
     
