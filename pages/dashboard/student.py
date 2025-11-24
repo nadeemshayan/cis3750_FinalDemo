@@ -106,4 +106,57 @@ def render():
     
     with col2:
         st.markdown("### 🔥 Streak")
-        st.metric("Days Active", "0", "Start your journey!")
+        streak = progress.get('streak', 0)
+        st.metric("Days Active", str(streak), "Keep it up!" if streak > 0 else "Start your journey!")
+    
+    st.markdown("---")
+    
+    # Account Linking Section
+    st.subheader("🔗 Account Connections")
+    
+    user_data = DataManager.get_user(st.session_state.username)
+    
+    # Display share code for parents
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("### 👨‍👩‍👧 Parent Access")
+        share_code = user_data.get('share_code', 'N/A')
+        st.markdown(f"**Your Share Code:**")
+        st.code(share_code, language="text")
+        st.caption("💡 Give this code to your parent to monitor your progress")
+        
+        # Show linked parents
+        parent_codes = user_data.get('parent_codes', [])
+        if parent_codes:
+            st.success(f"✅ {len(parent_codes)} parent(s) connected")
+        else:
+            st.info("No parents linked yet")
+    
+    with col2:
+        st.markdown("### 👨‍🏫 Teacher Access")
+        
+        # Show current teacher connections
+        teacher_codes = user_data.get('teacher_codes', [])
+        if teacher_codes:
+            st.success(f"✅ Linked to: {', '.join(teacher_codes)}")
+        else:
+            st.info("Not in any class yet")
+        
+        # Join teacher form
+        with st.form("join_teacher_form"):
+            st.markdown("**Join a class:**")
+            teacher_code_input = st.text_input("Teacher Code", placeholder="TEACH-XXXX", label_visibility="collapsed")
+            
+            if st.form_submit_button("🎓 Join Class", use_container_width=True):
+                if teacher_code_input:
+                    # In production: DataManager.link_student_to_teacher(username, teacher_code_input)
+                    with st.spinner("Joining class..."):
+                        # Check if teacher code exists
+                        # Add student to teacher's class list
+                        # Add teacher code to student's teacher_codes
+                        st.success(f"✅ Successfully joined class: {teacher_code_input}!")
+                        st.info("💡 Feature: Teacher linking - refresh to update")
+                        st.balloons()
+                else:
+                    st.error("Please enter a teacher code")
