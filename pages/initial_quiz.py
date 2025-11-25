@@ -264,7 +264,7 @@ def main():
     if "quiz_score" not in st.session_state:
         st.session_state.quiz_score = 0
     if "quiz_responses" not in st.session_state:
-        st.session_state.quiz_responses = [None] * len(QUESTIONS)
+        st.session_state.quiz_responses = []
     if "quiz_finished" not in st.session_state:
         st.session_state.quiz_finished = False
     if "quiz_data" not in st.session_state:
@@ -272,7 +272,7 @@ def main():
     if "shuffled_questions" not in st.session_state:
         st.session_state.shuffled_questions = None
     if "hints_used" not in st.session_state:
-        st.session_state.hints_used = [False] * len(QUESTIONS)
+        st.session_state.hints_used = []
     if "skipped_questions" not in st.session_state:
         st.session_state.skipped_questions = []
 
@@ -382,8 +382,12 @@ def main():
 
     # quiz screen
     elif not st.session_state.quiz_finished:
+        # Bounds check to prevent IndexError
+        if st.session_state.quiz_idx >= len(st.session_state.shuffled_questions):
+            st.session_state.quiz_idx = len(st.session_state.shuffled_questions) - 1
+        
         q = st.session_state.shuffled_questions[st.session_state.quiz_idx]
-        progress = (st.session_state.quiz_idx + 1) / len(QUESTIONS) * 100
+        progress = (st.session_state.quiz_idx + 1) / len(st.session_state.shuffled_questions) * 100
     
         # Progress bar
         st.markdown(f"""
@@ -392,7 +396,7 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     
-        st.markdown(f'<div class="question-number">Question {st.session_state.quiz_idx + 1} of {len(QUESTIONS)}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="question-number">Question {st.session_state.quiz_idx + 1} of {len(st.session_state.shuffled_questions)}</div>', unsafe_allow_html=True)
     
         # Question card
         st.markdown(f"""
@@ -433,7 +437,7 @@ def main():
             if st.button("⏭️ Skip Question", use_container_width=True):
                 if st.session_state.quiz_idx not in st.session_state.skipped_questions:
                     st.session_state.skipped_questions.append(st.session_state.quiz_idx)
-                if st.session_state.quiz_idx < len(QUESTIONS) - 1:
+                if st.session_state.quiz_idx < len(st.session_state.shuffled_questions) - 1:
                     st.session_state.quiz_idx += 1
                     st.rerun()
     
@@ -451,18 +455,18 @@ def main():
             if st.button("🔄 Restart Quiz", use_container_width=True):
                 st.session_state.quiz_started = False
                 st.session_state.quiz_idx = 0
-                st.session_state.quiz_responses = [None] * len(QUESTIONS)
+                st.session_state.quiz_responses = [None] * 8
                 st.rerun()
     
         with col3:
-            if st.session_state.quiz_idx < len(QUESTIONS) - 1:
+            if st.session_state.quiz_idx < len(st.session_state.shuffled_questions) - 1:
                 if st.button("Next ▶", type="primary", use_container_width=True):
                     st.session_state.quiz_idx += 1
                     st.rerun()
             else:
                 # Allow submission if all questions answered or if some were skipped
                 answered_count = sum(1 for r in st.session_state.quiz_responses if r is not None)
-                submit_enabled = answered_count >= len(QUESTIONS) - len(st.session_state.skipped_questions)
+                submit_enabled = answered_count >= len(st.session_state.shuffled_questions) - len(st.session_state.skipped_questions)
                 
                 if st.button("✅ Submit Quiz", disabled=not submit_enabled, type="primary", use_container_width=True):
                     # Calculate results with shuffled answers
@@ -477,7 +481,7 @@ def main():
                         "questions": st.session_state.shuffled_questions,
                         "responses": st.session_state.quiz_responses,
                         "score": correct_count,
-                        "total": len(QUESTIONS)
+                        "total": len(st.session_state.shuffled_questions)
                     }
                 
                     st.session_state.quiz_finished = True
@@ -487,7 +491,7 @@ def main():
     # results screen
     else:
         score = st.session_state.quiz_score
-        total = len(QUESTIONS)
+        total = len(st.session_state.shuffled_questions)
         pct = round(100 * score / total)
         
         if pct >= 90:
@@ -641,10 +645,10 @@ def main():
                 st.session_state.quiz_started = False
                 st.session_state.quiz_idx = 0
                 st.session_state.quiz_score = 0
-                st.session_state.quiz_responses = [None] * len(QUESTIONS)
+                st.session_state.quiz_responses = [None] * 8
                 st.session_state.quiz_finished = False
                 st.session_state.quiz_analyzed = False
                 st.session_state.shuffled_questions = None
-                st.session_state.hints_used = [False] * len(QUESTIONS)
+                st.session_state.hints_used = [False] * 8
                 st.session_state.skipped_questions = []
                 st.rerun()
