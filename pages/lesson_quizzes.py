@@ -242,44 +242,56 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Get user's past performance for adaptive selection
-    progress = DataManager.get_user_progress(username)
-    lesson_history = progress.get('lesson_quizzes', {}).get(lesson_key, {})
-    past_score = lesson_history.get('best_score_pct', 0)
+    # Store selected questions in session state to prevent re-shuffling on each interaction
+    session_key = f"quiz_questions_{lesson_key}"
     
-    # Adaptive question selection (10 questions)
-    easy_q = [q for q in questions if q['difficulty'] == 'easy']
-    medium_q = [q for q in questions if q['difficulty'] == 'medium']
-    hard_q = [q for q in questions if q['difficulty'] == 'hard']
-    
-    selected_questions = []
-    if past_score == 0:  # First attempt
-        selected_questions.extend(random.sample(easy_q, min(4, len(easy_q))))
-        selected_questions.extend(random.sample(medium_q, min(4, len(medium_q))))
-        selected_questions.extend(random.sample(hard_q, min(2, len(hard_q))))
-    elif past_score < 50:  # Struggling
-        selected_questions.extend(random.sample(easy_q, min(5, len(easy_q))))
-        selected_questions.extend(random.sample(medium_q, min(3, len(medium_q))))
-        selected_questions.extend(random.sample(hard_q, min(2, len(hard_q))))
-    elif past_score < 80:  # Improving
-        selected_questions.extend(random.sample(easy_q, min(3, len(easy_q))))
-        selected_questions.extend(random.sample(medium_q, min(4, len(medium_q))))
-        selected_questions.extend(random.sample(hard_q, min(3, len(hard_q))))
-    else:  # Mastering
-        selected_questions.extend(random.sample(easy_q, min(2, len(easy_q))))
-        selected_questions.extend(random.sample(medium_q, min(3, len(medium_q))))
-        selected_questions.extend(random.sample(hard_q, min(5, len(hard_q))))
-    
-    # Fill to 10 if needed
-    while len(selected_questions) < 10 and len(selected_questions) < len(questions):
-        remaining = [q for q in questions if q not in selected_questions]
-        if remaining:
-            selected_questions.append(random.choice(remaining))
-    
-    selected_questions = selected_questions[:10]
-    
-    # Shuffle
-    random.shuffle(selected_questions)
+    if session_key not in st.session_state:
+        # Get user's past performance for adaptive selection
+        progress = DataManager.get_user_progress(username)
+        lesson_history = progress.get('lesson_quizzes', {}).get(lesson_key, {})
+        past_score = lesson_history.get('best_score_pct', 0)
+        
+        # Adaptive question selection (10 questions)
+        easy_q = [q for q in questions if q['difficulty'] == 'easy']
+        medium_q = [q for q in questions if q['difficulty'] == 'medium']
+        hard_q = [q for q in questions if q['difficulty'] == 'hard']
+        
+        selected_questions = []
+        if past_score == 0:  # First attempt
+            selected_questions.extend(random.sample(easy_q, min(4, len(easy_q))))
+            selected_questions.extend(random.sample(medium_q, min(4, len(medium_q))))
+            selected_questions.extend(random.sample(hard_q, min(2, len(hard_q))))
+        elif past_score < 50:  # Struggling
+            selected_questions.extend(random.sample(easy_q, min(5, len(easy_q))))
+            selected_questions.extend(random.sample(medium_q, min(3, len(medium_q))))
+            selected_questions.extend(random.sample(hard_q, min(2, len(hard_q))))
+        elif past_score < 80:  # Improving
+            selected_questions.extend(random.sample(easy_q, min(3, len(easy_q))))
+            selected_questions.extend(random.sample(medium_q, min(4, len(medium_q))))
+            selected_questions.extend(random.sample(hard_q, min(3, len(hard_q))))
+        else:  # Mastering
+            selected_questions.extend(random.sample(easy_q, min(2, len(easy_q))))
+            selected_questions.extend(random.sample(medium_q, min(3, len(medium_q))))
+            selected_questions.extend(random.sample(hard_q, min(5, len(hard_q))))
+        
+        # Fill to 10 if needed
+        while len(selected_questions) < 10 and len(selected_questions) < len(questions):
+            remaining = [q for q in questions if q not in selected_questions]
+            if remaining:
+                selected_questions.append(random.choice(remaining))
+        
+        selected_questions = selected_questions[:10]
+        
+        # Shuffle
+        random.shuffle(selected_questions)
+        
+        # Store in session state
+        st.session_state[session_key] = selected_questions
+        st.session_state[f"{session_key}_past_score"] = past_score
+    else:
+        # Use stored questions
+        selected_questions = st.session_state[session_key]
+        past_score = st.session_state.get(f"{session_key}_past_score", 0)
     
     # Show adaptive info
     st.info(f"🤖 **Adaptive Selection:** Based on your performance (best: {past_score}%), we've selected 10 questions tailored to your skill level.")
@@ -455,6 +467,12 @@ def main():
             st.rerun()
     with col3:
         if st.button("🔄 Retry Quiz"):
+            # Clear the stored questions so new ones get selected
+            session_key = f"quiz_questions_{lesson_key}"
+            if session_key in st.session_state:
+                del st.session_state[session_key]
+            if f"{session_key}_past_score" in st.session_state:
+                del st.session_state[f"{session_key}_past_score"]
             st.rerun()
 
 
