@@ -118,10 +118,14 @@ def main():
                 st.markdown("**🎯 Focus Areas:**")
                 weak_topics = quiz_data.get('weak_topics', [])
                 for topic in weak_topics:
-                    # Get ML-calculated confidence for this topic
+                    # Get ML-calculated confidence for this topic (from practice problems)
                     confidence = calculate_topic_confidence(username, topic)
-                    diff = get_adaptive_difficulty(username, topic)
-                    st.markdown(f"⚠️ {topic} - {confidence}% confidence")
+                    
+                    # If no practice yet, show based on quiz results
+                    if confidence == 0:
+                        st.markdown(f"⚠️ {topic} - Needs practice (weak on quiz)")
+                    else:
+                        st.markdown(f"⚠️ {topic} - {confidence}% confidence")
                 
                 if weak_topics:
                     st.markdown("")
