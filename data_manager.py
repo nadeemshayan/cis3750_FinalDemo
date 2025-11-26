@@ -179,7 +179,14 @@ class DataManager:
         """Get user progress data"""
         # Use Supabase if available
         if USE_SUPABASE:
-            return SupabaseDataManager.get_user_progress(username)
+            try:
+                result = SupabaseDataManager.get_user_progress(username)
+                print(f"📖 Supabase get_user_progress: {username} → Overall={result.get('overall_progress', 0)}%")
+                return result
+            except Exception as e:
+                print(f"❌ Supabase get_user_progress failed: {e}")
+                # Don't fall back, re-raise to show the error
+                raise
         
         # JSON fallback
         progress_data = DataManager._load_json(PROGRESS_FILE)
@@ -214,10 +221,12 @@ class DataManager:
         # Use Supabase if available
         if USE_SUPABASE:
             try:
+                print(f"💾 Attempting Supabase save: {username} - {quiz_type}")
                 SupabaseDataManager.save_quiz_results(username, quiz_type, score, total, weak_topics, strong_topics)
                 print(f"✅ Saved to Supabase: {username} - {quiz_type}")
+                return  # Success, don't fall back to JSON
             except Exception as e:
-                print(f"⚠️ Supabase save failed: {e}, falling back to JSON")
+                print(f"❌ Supabase save failed: {e}")
         
         # JSON fallback (always save to JSON too for safety)
         progress = DataManager._load_json(PROGRESS_FILE)
@@ -263,10 +272,12 @@ class DataManager:
         # Use Supabase if available
         if USE_SUPABASE:
             try:
+                print(f"💾 Attempting Supabase lesson save: {username} - {lesson_id}")
                 SupabaseDataManager.save_lesson_progress(username, lesson_id, completed, time_spent)
                 print(f"✅ Saved to Supabase: {username} - Lesson {lesson_id}")
+                return  # Success, don't fall back to JSON
             except Exception as e:
-                print(f"⚠️ Supabase save failed: {e}, falling back to JSON")
+                print(f"❌ Supabase lesson save failed: {e}")
         
         # JSON fallback (always save to JSON too for safety)
         progress = DataManager._load_json(PROGRESS_FILE)
