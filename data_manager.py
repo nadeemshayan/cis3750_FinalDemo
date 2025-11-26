@@ -6,13 +6,14 @@ from typing import Dict, List, Optional, Any
 import hashlib
 
 # Try to use Supabase, fall back to JSON for local dev
-# TEMPORARILY DISABLED - Supabase manager missing save_quiz_results/save_lesson_progress methods
-USE_SUPABASE = False
+# NOW ENABLED - Supabase manager now has complete progress calculation
+USE_SUPABASE = True
 try:
     from database.supabase_manager import SupabaseDataManager
-except:
+    print("✅ Supabase enabled - Progress will persist on cloud!")
+except Exception as e:
     USE_SUPABASE = False
-    print("⚠️ Supabase not configured, using JSON fallback")
+    print(f"⚠️ Supabase not configured ({e}), using JSON fallback")
 
 # JSON fallback configuration
 DATA_DIR = Path(__file__).parent / "data"

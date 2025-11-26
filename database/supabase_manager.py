@@ -248,6 +248,20 @@ class SupabaseDataManager:
                 progress['lesson_quizzes'] = {}
             progress['lesson_quizzes'][quiz_type] = quiz_data
         
+        # Update overall progress (quiz 20%, lessons 60%, practice 20%)
+        quiz_completed = progress.get("initial_quiz", {}).get("completed", False)
+        lessons_completed = len([l for l in progress.get("lessons", {}).values() if l.get("completed")])
+        practice_done = len(progress.get("practice_problems", {}))
+        
+        overall = 0
+        if quiz_completed:
+            overall += 20
+        overall += (lessons_completed / 6) * 60 if lessons_completed > 0 else 0
+        overall += (practice_done / 10) * 20 if practice_done > 0 else 0
+        
+        progress["overall_progress"] = int(overall)
+        print(f"📊 Supabase Quiz Progress Update: Quiz={quiz_completed}, Lessons={lessons_completed}/6, Practice={practice_done}/10 → Overall={int(overall)}%")
+        
         SupabaseDataManager.update_user_progress(username, progress)
     
     @staticmethod
@@ -266,6 +280,20 @@ class SupabaseDataManager:
         
         # Update total time spent
         progress['total_time_spent'] = progress.get('total_time_spent', 0) + time_spent
+        
+        # Update overall progress (quiz 20%, lessons 60%, practice 20%)
+        quiz_completed = progress.get("initial_quiz", {}).get("completed", False)
+        lessons_completed = len([l for l in progress.get("lessons", {}).values() if l.get("completed")])
+        practice_done = len(progress.get("practice_problems", {}))
+        
+        overall = 0
+        if quiz_completed:
+            overall += 20
+        overall += (lessons_completed / 6) * 60 if lessons_completed > 0 else 0
+        overall += (practice_done / 10) * 20 if practice_done > 0 else 0
+        
+        progress["overall_progress"] = int(overall)
+        print(f"📊 Supabase Lesson Progress Update: Quiz={quiz_completed}, Lessons={lessons_completed}/6, Practice={practice_done}/10 → Overall={int(overall)}%")
         
         SupabaseDataManager.update_user_progress(username, progress)
     
