@@ -338,5 +338,62 @@ class SupabaseDataManager:
             }).eq('username', username).execute()
             
             return True
-        except:
+        except Exception as e:
+            print(f"Error resetting password: {e}")
             return False
+    
+    @staticmethod
+    def link_parent_to_child(parent_username: str, child_share_code: str) -> tuple:
+        """
+        Link a parent to their child's account using share code
+        Returns: (success: bool, message: str)
+        """
+        supabase = get_supabase_client()
+        
+        try:
+            # Check if parent exists
+            parent_response = supabase.table('users').select('*').eq('username', parent_username).execute()
+            if not parent_response.data:
+                return False, "Parent account not found"
+            
+            parent_data = parent_response.data[0]
+            
+            # Find child with this share code
+            child_response = supabase.table('users').select('*').eq('share_code', child_share_code).execute()
+            if not child_response.data:
+                return False, f"Student with share code '{child_share_code}' not found"
+            
+            child_data = child_response.data[0]
+            child_username = child_data['username']
+            
+            # Get current children list
+            children = parent_data.get('children', [])
+            if not isinstance(children, list):
+                children = []
+            
+            # Check if already linked
+            if child_username in children:
+                return False, "Child already linked"
+            
+            # Add child to parent's list
+            children.append(child_username)
+            supabase.table('users').update({
+                'children': children
+            }).eq('username', parent_username).execute()
+            
+            # Add parent to child's parent_codes list
+            parent_codes = child_data.get('parent_codes', [])
+            if not isinstance(parent_codes, list):
+                parent_codes = []
+            
+            if parent_username not in parent_codes:
+                parent_codes.append(parent_username)
+                supabase.table('users').update({
+                    'parent_codes': parent_codes
+                }).eq('username', child_username).execute()
+            
+            return True, f"Successfully linked to {child_username}'s account!"
+        
+        except Exception as e:
+            print(f"Error linking parent to child: {e}")
+            return False, f"Error: {str(e)}"

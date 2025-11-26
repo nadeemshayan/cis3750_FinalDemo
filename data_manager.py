@@ -405,6 +405,14 @@ class DataManager:
         Link a parent to their child's account using share code
         Returns: (success: bool, message: str)
         """
+        # Try Supabase first
+        if USE_SUPABASE:
+            try:
+                return SupabaseDataManager.link_parent_to_child(parent_username, child_share_code)
+            except Exception as e:
+                print(f"⚠️ Supabase link failed, falling back to JSON: {e}")
+        
+        # JSON fallback
         users = DataManager._load_json(USERS_FILE)
         
         # Check if parent exists
