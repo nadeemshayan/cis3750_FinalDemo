@@ -213,8 +213,8 @@ def main():
     
     with col1:
         predicted_score = prediction['predicted_score']
-        confidence_lower = prediction['confidence_lower']
-        confidence_upper = prediction['confidence_upper']
+        confidence_lower = prediction.get('confidence_lower', prediction.get('range_low', predicted_score - 10))
+        confidence_upper = prediction.get('confidence_upper', prediction.get('range_high', predicted_score + 10))
         
         # Color based on prediction
         if predicted_score >= 85:

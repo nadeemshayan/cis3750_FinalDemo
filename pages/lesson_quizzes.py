@@ -899,26 +899,36 @@ def main():
         unsafe_allow_html=True,
     )
     st.markdown(
-        '<p class="sub-header">Each quiz uses an easy, medium, hard bank for its lesson. You can add more questions to the banks when you need the full sixty.</p>',
+        '<p class="sub-header">Master each lesson with ML-adaptive quizzes that adjust to your skill level.</p>',
         unsafe_allow_html=True,
     )
-
-lesson_labels = [meta["label"] for meta in LESSON_META.values()]
-lesson_keys = list(LESSON_META.keys())
-
-selected_label = st.selectbox(
-    "Choose a lesson to quiz yourself on",
-    options=lesson_labels,
-)
-
-selected_key = lesson_keys[lesson_labels.index(selected_label)]
-meta = LESSON_META[selected_key]
-questions = QUESTION_BANKS[selected_key]
-
-# ------------- lesson header card -------------
-
-st.markdown(
-    f"""
+    
+    lesson_labels = [meta["label"] for meta in LESSON_META.values()]
+    lesson_keys = list(LESSON_META.keys())
+    
+    # Auto-select lesson if coming from a specific lesson page
+    default_lesson = st.session_state.get('quiz_lesson_id', None)
+    default_index = 0
+    if default_lesson and default_lesson in lesson_keys:
+        default_index = lesson_keys.index(default_lesson)
+        # Clear after using
+        if 'quiz_lesson_id' in st.session_state:
+            del st.session_state['quiz_lesson_id']
+    
+    selected_label = st.selectbox(
+        "Choose a lesson to quiz yourself on",
+        options=lesson_labels,
+        index=default_index,
+    )
+    
+    selected_key = lesson_keys[lesson_labels.index(selected_label)]
+    meta = LESSON_META[selected_key]
+    questions = QUESTION_BANKS[selected_key]
+    
+    # ------------- lesson header card -------------
+    
+    st.markdown(
+        f"""
 <div class="quiz-header-card" style="background: {meta['gradient']};">
     <div class="lesson-badge" style="color: {meta['badge_color']};">
         {meta['label']}
@@ -928,68 +938,68 @@ st.markdown(
     <div class="quiz-meta">🤖 <strong>ML-Adaptive Quiz:</strong> This quiz intelligently selects 5 questions based on your performance. Master easy questions to unlock harder ones!</div>
 </div>
 """,
-    unsafe_allow_html=True,
-)
-
-# adaptive question selection
-def select_adaptive_questions(lesson_key, all_questions, username):
-    # get past performance
-    progress = DataManager.get_user_progress(username) if username else {}
-    lesson_history = progress.get('lesson_quizzes', {}).get(lesson_key, {})
-    
-    easy_q = [q for q in all_questions if q['difficulty'] == 'easy']
-    medium_q = [q for q in all_questions if q['difficulty'] == 'medium']
-    hard_q = [q for q in all_questions if q['difficulty'] == 'hard']
-    
-    selected = []
-    past_score = lesson_history.get('best_score_pct', 0)
-    
-    if past_score == 0:
-        # first try - start easier
-        selected.extend(random.sample(easy_q, min(2, len(easy_q))))
-        selected.extend(random.sample(medium_q, min(2, len(medium_q))))
-        selected.extend(random.sample(hard_q, min(1, len(hard_q))))
-    elif past_score < 60:
-        selected.extend(random.sample(easy_q, min(2, len(easy_q))))
-        selected.extend(random.sample(medium_q, min(2, len(medium_q))))
-        selected.extend(random.sample(hard_q, min(1, len(hard_q))))
-    elif past_score < 80:
-        selected.extend(random.sample(easy_q, min(1, len(easy_q))))
-        selected.extend(random.sample(medium_q, min(2, len(medium_q))))
-        selected.extend(random.sample(hard_q, min(2, len(hard_q))))
-    else:
-        selected.extend(random.sample(easy_q, min(1, len(easy_q))))
-        selected.extend(random.sample(medium_q, min(1, len(medium_q))))
-        selected.extend(random.sample(hard_q, min(3, len(hard_q))))
-    
-    while len(selected) < 5 and len(all_questions) > len(selected):
-        remaining = [q for q in all_questions if q not in selected]
-        if remaining:
-            selected.append(random.choice(remaining))
-    
-    return selected[:5]
-
-username = st.session_state.get('username', 'guest')
-
-# select questions
-questions = select_adaptive_questions(selected_key, questions, username)
-
-st.info(f"🤖 **Adaptive Selection:** Based on your performance, we've selected {len(questions)} questions tailored to your skill level.")
-
-answers = {}
-correct_flags = {}
-
-for idx, q in enumerate(questions, start=1):
-    difficulty = q["difficulty"]
-    diff_class = (
-        "difficulty-easy"
-        if difficulty == "easy"
-        else "difficulty-medium"
-        if difficulty == "medium"
-        else "difficulty-hard"
+        unsafe_allow_html=True,
     )
-
-    st.markdown(
+    
+    # adaptive question selection
+    def select_adaptive_questions(lesson_key, all_questions, username):
+        # get past performance
+        progress = DataManager.get_user_progress(username) if username else {}
+        lesson_history = progress.get('lesson_quizzes', {}).get(lesson_key, {})
+        
+        easy_q = [q for q in all_questions if q['difficulty'] == 'easy']
+        medium_q = [q for q in all_questions if q['difficulty'] == 'medium']
+        hard_q = [q for q in all_questions if q['difficulty'] == 'hard']
+        
+        selected = []
+        past_score = lesson_history.get('best_score_pct', 0)
+        
+        if past_score == 0:
+            # first try - start easier
+            selected.extend(random.sample(easy_q, min(2, len(easy_q))))
+            selected.extend(random.sample(medium_q, min(2, len(medium_q))))
+            selected.extend(random.sample(hard_q, min(1, len(hard_q))))
+        elif past_score < 60:
+            selected.extend(random.sample(easy_q, min(2, len(easy_q))))
+            selected.extend(random.sample(medium_q, min(2, len(medium_q))))
+            selected.extend(random.sample(hard_q, min(1, len(hard_q))))
+        elif past_score < 80:
+            selected.extend(random.sample(easy_q, min(1, len(easy_q))))
+            selected.extend(random.sample(medium_q, min(2, len(medium_q))))
+            selected.extend(random.sample(hard_q, min(2, len(hard_q))))
+        else:
+            selected.extend(random.sample(easy_q, min(1, len(easy_q))))
+            selected.extend(random.sample(medium_q, min(1, len(medium_q))))
+            selected.extend(random.sample(hard_q, min(3, len(hard_q))))
+        
+        while len(selected) < 5 and len(all_questions) > len(selected):
+            remaining = [q for q in all_questions if q not in selected]
+            if remaining:
+                selected.append(random.choice(remaining))
+    
+        return selected[:5]
+    
+    username = st.session_state.get('username', 'guest')
+    
+    # select questions
+    questions = select_adaptive_questions(selected_key, questions, username)
+    
+    st.info(f"🤖 **Adaptive Selection:** Based on your performance, we've selected {len(questions)} questions tailored to your skill level.")
+    
+    answers = {}
+    correct_flags = {}
+    
+    for idx, q in enumerate(questions, start=1):
+        difficulty = q["difficulty"]
+        diff_class = (
+            "difficulty-easy"
+            if difficulty == "easy"
+            else "difficulty-medium"
+            if difficulty == "medium"
+            else "difficulty-hard"
+        )
+        
+        st.markdown(
         f"""
 <div class="quiz-card">
     <div class="question-header">
@@ -1002,54 +1012,54 @@ for idx, q in enumerate(questions, start=1):
         unsafe_allow_html=True,
     )
 
-    choice = st.radio(
-        "",
-        q["choices"],
-        key=f"{selected_key}_{q['id']}",
-        label_visibility="collapsed",
-    )
-    answers[q["id"]] = choice
-
-submit = st.button("Submit lesson quiz")
-
-if submit:
-    total = len(questions)
-    correct_count = 0
-    easy_correct = 0
-    easy_total = 0
-    medium_correct = 0
-    medium_total = 0
-    hard_correct = 0
-    hard_total = 0
-    topic_performance = {}
-
-    for q in questions:
-        picked = answers.get(q["id"])
-        picked_index = q["choices"].index(picked) if picked in q["choices"] else None
-        is_correct = picked_index == q["answer"]
-        correct_flags[q["id"]] = is_correct
-
-        if q["difficulty"] == "easy":
-            easy_total += 1
-            if is_correct:
-                easy_correct += 1
-        elif q["difficulty"] == "medium":
-            medium_total += 1
-            if is_correct:
-                medium_correct += 1
-        else:
-            hard_total += 1
-            if is_correct:
-                hard_correct += 1
-
-        if is_correct:
-            correct_count += 1
-
-    pct = round(100 * correct_count / total) if total > 0 else 0
+        choice = st.radio(
+            "",
+            q["choices"],
+            key=f"{selected_key}_{q['id']}",
+            label_visibility="collapsed",
+        )
+        answers[q["id"]] = choice
     
-    # save results
-    if username != 'guest':
-        DataManager.update_progress(
+    submit = st.button("Submit lesson quiz")
+
+    if submit:
+        total = len(questions)
+        correct_count = 0
+        easy_correct = 0
+        easy_total = 0
+        medium_correct = 0
+        medium_total = 0
+        hard_correct = 0
+        hard_total = 0
+        topic_performance = {}
+        
+        for q in questions:
+            picked = answers.get(q["id"])
+            picked_index = q["choices"].index(picked) if picked in q["choices"] else None
+            is_correct = picked_index == q["answer"]
+            correct_flags[q["id"]] = is_correct
+            
+            if q["difficulty"] == "easy":
+                easy_total += 1
+                if is_correct:
+                    easy_correct += 1
+            elif q["difficulty"] == "medium":
+                medium_total += 1
+                if is_correct:
+                    medium_correct += 1
+            else:
+                hard_total += 1
+                if is_correct:
+                    hard_correct += 1
+            
+            if is_correct:
+                correct_count += 1
+        
+        pct = round(100 * correct_count / total) if total > 0 else 0
+        
+        # save results
+        if username != 'guest':
+            DataManager.update_progress(
             username,
             'lesson_quizzes',
             {
@@ -1066,26 +1076,26 @@ if submit:
                     'attempts': DataManager.get_user_progress(username).get('lesson_quizzes', {}).get(selected_key, {}).get('attempts', 0) + 1
                 }
             }
-        )
-
-    performance_level = "Mastering" if pct >= 80 else "Improving" if pct >= 60 else "Learning"
-    difficulty_trend = ""
-    next_steps = ""
-    
-    if easy_total > 0 and easy_correct == easy_total and medium_correct >= medium_total * 0.8:
-        difficulty_trend = "📈 Strong foundation! You're ready for more challenging questions."
-        next_steps = "Your next quiz will include more hard questions to challenge you."
-    elif easy_correct < easy_total * 0.6:
-        difficulty_trend = "📚 Focus on fundamentals. Review the lesson content for this topic."
-        next_steps = "Your next quiz will focus on easier questions to build your foundation."
-    elif hard_total > 0 and hard_correct >= hard_total * 0.6:
-        difficulty_trend = "🌟 Excellent! You're mastering advanced concepts."
-        next_steps = "Keep challenging yourself with complex problems!"
-    else:
-        difficulty_trend = "💪 Good progress! Keep practicing to improve."
-        next_steps = "Your next quiz will adapt to help you improve further."
-    
-    st.markdown(
+            )
+        
+        performance_level = "Mastering" if pct >= 80 else "Improving" if pct >= 60 else "Learning"
+        difficulty_trend = ""
+        next_steps = ""
+        
+        if easy_total > 0 and easy_correct == easy_total and medium_correct >= medium_total * 0.8:
+            difficulty_trend = "📈 Strong foundation! You're ready for more challenging questions."
+            next_steps = "Your next quiz will include more hard questions to challenge you."
+        elif easy_correct < easy_total * 0.6:
+            difficulty_trend = "📚 Focus on fundamentals. Review the lesson content for this topic."
+            next_steps = "Your next quiz will focus on easier questions to build your foundation."
+        elif hard_total > 0 and hard_correct >= hard_total * 0.6:
+            difficulty_trend = "🌟 Excellent! You're mastering advanced concepts."
+            next_steps = "Keep challenging yourself with complex problems!"
+        else:
+            difficulty_trend = "💪 Good progress! Keep practicing to improve."
+            next_steps = "Your next quiz will adapt to help you improve further."
+        
+        st.markdown(
         f"""
 <div class="result-box">
     <div class="result-score">{pct}%</div>
@@ -1104,57 +1114,56 @@ if submit:
     </div>
 </div>
 """,
-        unsafe_allow_html=True,
-    )
-    
-    # Show improvement over attempts
-    if username != 'guest':
-        attempts = DataManager.get_user_progress(username).get('lesson_quizzes', {}).get(selected_key, {}).get('attempts', 1)
-        best_score = DataManager.get_user_progress(username).get('lesson_quizzes', {}).get(selected_key, {}).get('best_score_pct', pct)
-        if attempts > 1:
-            if pct > best_score - 10:
-                st.success(f"📊 **Progress Tracking:** This is attempt #{attempts}. Best score: {best_score}%")
-            if pct == best_score and pct >= 80:
-                st.balloons()
-                st.success("🎉 **New Personal Best!** You're mastering this lesson!")
-            elif pct > best_score:
-                st.success(f"🎉 **Improvement!** You scored {pct - best_score}% better than your previous best!")
-
-    for idx, q in enumerate(questions, start=1):
-        picked = answers.get(q["id"])
-        picked_index = q["choices"].index(picked) if picked in q["choices"] else None
-        is_correct = picked_index == q["answer"]
-
-        css_class = (
-            "per-question-correct" if is_correct else "per-question-wrong"
+            unsafe_allow_html=True,
         )
-        label = "Correct" if is_correct else "Check this one again"
-
-        st.markdown(
+        
+        # Show improvement over attempts
+        if username != 'guest':
+            attempts = DataManager.get_user_progress(username).get('lesson_quizzes', {}).get(selected_key, {}).get('attempts', 1)
+            best_score = DataManager.get_user_progress(username).get('lesson_quizzes', {}).get(selected_key, {}).get('best_score_pct', pct)
+            if attempts > 1:
+                if pct > best_score - 10:
+                    st.success(f"📊 **Progress Tracking:** This is attempt #{attempts}. Best score: {best_score}%")
+                if pct == best_score and pct >= 80:
+                    st.balloons()
+                    st.success("🎉 **New Personal Best!** You're mastering this lesson!")
+                elif pct > best_score:
+                    st.success(f"🎉 **Improvement!** You scored {pct - best_score}% better than your previous best!")
+        
+        for idx, q in enumerate(questions, start=1):
+            picked = answers.get(q["id"])
+            picked_index = q["choices"].index(picked) if picked in q["choices"] else None
+            is_correct = picked_index == q["answer"]
+            
+            css_class = (
+                "per-question-correct" if is_correct else "per-question-wrong"
+            )
+            label = "Correct" if is_correct else "Check this one again"
+            
+            st.markdown(
             f"""
 <div class="per-question-result {css_class}">
     Question {idx}: {label}
 </div>
 """,
-            unsafe_allow_html=True,
-        )
-
-
-st.markdown("---")
-col_a, col_b, col_c = st.columns(3)
-with col_a:
-    if st.button("Back to lessons"):
-        if "current_page" in st.session_state:
-            st.session_state.current_page = "lessons"
+                unsafe_allow_html=True,
+            )
+    
+    st.markdown("---")
+    col_a, col_b, col_c = st.columns(3)
+    with col_a:
+        if st.button("Back to lessons"):
+            if "current_page" in st.session_state:
+                st.session_state.current_page = "lessons"
+                st.rerun()
+    with col_b:
+        if st.button("Back to home"):
+            if "current_page" in st.session_state:
+                st.session_state.current_page = "dashboard"
+                st.rerun()
+    with col_c:
+        if st.button("Retry quiz", type="primary"):
             st.rerun()
-with col_b:
-    if st.button("Back to home"):
-        if "current_page" in st.session_state:
-            st.session_state.current_page = "dashboard"
-            st.rerun()
-with col_c:
-    if st.button("Retry quiz", type="primary"):
-        st.rerun()
 
 if __name__ == "__main__":
     main()

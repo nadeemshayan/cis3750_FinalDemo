@@ -112,11 +112,11 @@ def calculate_learning_velocity(username: str) -> Tuple[float, str]:
     
     # Classify learner
     if velocity > 15:
-        learner_type = "fast_learner"      # 🚀
+        learner_type = "Fast Learner"      # 🚀
     elif velocity > 5:
-        learner_type = "steady_progress"   # 📈
+        learner_type = "Steady Progress"   # 📈
     else:
-        learner_type = "needs_support"     # 🤝
+        learner_type = "Gradual Learner"   # 🐢 # 🤝
     
     return velocity, learner_type
 
