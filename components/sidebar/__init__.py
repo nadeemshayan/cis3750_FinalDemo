@@ -160,10 +160,9 @@ def render_teacher_nav():
 
 def render_parent_nav():
     """Parent navigation buttons"""
+    # Parents only have dashboard - children's progress shown there
     pages = [
         ("🏠 Dashboard", "dashboard"),
-        ("👶 Children", "children"),
-        ("📈 Progress", "progress"),
     ]
     
     current_page = st.session_state.get('current_page', 'dashboard')
