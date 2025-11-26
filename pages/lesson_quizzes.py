@@ -1,1169 +1,452 @@
+"""
+Lesson Quizzes - Clean, beautiful, ML-adaptive
+"""
 import streamlit as st
-import sys
-from pathlib import Path
-from datetime import datetime
-import random
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
 from data_manager import DataManager
+import random
+from datetime import datetime
 
-def apply_quiz_styles():
-    """Apply custom styles for lesson quizzes"""
-    st.markdown(
-    """
-<style>
-    [data-testid="stAppViewContainer"] {
-        background-color: #0E1117;
-    }
-
-    [data-testid="stSidebar"] {
-        display: none;
-    }
-
-    .main-header {
-        font-size: 48px;
-        font-weight: 700;
-        color: #FFFFFF;
-        margin-bottom: 10px;
-        line-height: 1.2;
-    }
-
-    .sub-header {
-        font-size: 20px;
-        color: #B3B3B3;
-        margin-bottom: 30px;
-    }
-
-    .quiz-card {
-        background-color: #1E1E1E;
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        margin-bottom: 20px;
-        border: 1px solid #2d2d2d;
-    }
-
-    .quiz-header-card {
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        margin-bottom: 25px;
-        color: #FFFFFF;
-        background-color: #1E1E1E;
-        border: 1px solid #2d2d2d;
-    }
-
-    .lesson-badge {
-        display: inline-block;
-        padding: 8px 16px;
-        border-radius: 14px;
-        font-size: 14px;
-        font-weight: 600;
-        background-color: #2d2d2d;
-        color: #FFFFFF;
-        margin-bottom: 10px;
-    }
-
-    .quiz-title {
-        font-size: 28px;
-        font-weight: 700;
-        margin-bottom: 8px;
-        color: #FFFFFF;
-    }
-
-    .quiz-goal {
-        font-size: 16px;
-        color: #B3B3B3;
-        font-style: italic;
-        margin-bottom: 5px;
-    }
-
-    .quiz-meta {
-        font-size: 14px;
-        color: #B3B3B3;
-    }
-
-    .question-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-        font-size: 14px;
-        color: #B3B3B3;
-    }
-
-    .difficulty-badge {
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .difficulty-easy {
-        background-color: #E8F5E9;
-        color: #2E7D32;
-    }
-
-    .difficulty-medium {
-        background-color: #FFF3E0;
-        color: #EF6C00;
-    }
-
-    .difficulty-hard {
-        background-color: #FFEBEE;
-        color: #C62828;
-    }
-
-    .question-stem {
-        font-size: 17px;
-        font-weight: 600;
-        color: #FFFFFF;
-        margin-bottom: 10px;
-    }
-
-    .result-box {
-        background: linear-gradient(135deg, #1a4d2e 0%, #2d5f3f 100%);
-        border-radius: 18px;
-        padding: 25px;
-        margin-top: 20px;
-        margin-bottom: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        border: 1px solid #3d7f5f;
-    }
-
-    .result-score {
-        font-size: 40px;
-        font-weight: 700;
-        color: #FFFFFF;
-        margin-bottom: 5px;
-    }
-
-    .result-text {
-        font-size: 15px;
-        color: #E0E0E0;
-    }
-
-    .per-question-result {
-        font-size: 14px;
-        margin-top: 4px;
-    }
-
-    .per-question-correct {
-        color: #2E7D32;
-    }
-
-    .per-question-wrong {
-        color: #C62828;
-    }
-
-    .stButton > button {
-        border-radius: 15px;
-        padding: 10px 22px;
-        font-weight: 600;
-        border: none;
-        transition: all 0.3s ease;
-    }
-
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-</style>
-""",
-    unsafe_allow_html=True,
-)
-
-# left vertical icons to match other pages
-st.markdown(
-    """
-<div style="position: fixed; left: 20px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 20px; z-index: 1000;">
-    <div style="width: 50px; height: 50px; background-color: white;
-                border: 2px solid #e0e0e0; border-radius: 15px;
-                display: flex; align-items: center; justify-content: center;
-                font-size: 24px; cursor: pointer;">🏠</div>
-    <div style="width: 50px; height: 50px; background-color: white;
-                border: 2px solid #e0e0e0; border-radius: 15px;
-                display: flex; align-items: center; justify-content: center;
-                font-size: 24px; cursor: pointer;">📚</div>
-    <div style="width: 50px; height: 50px; background-color: #1a1a1a;
-                border-radius: 15px;
-                display: flex; align-items: center; justify-content: center;
-                font-size: 24px; cursor: pointer;">🎯</div>
-    <div style="width: 50px; height: 50px; background-color: white;
-                border: 2px solid #e0e0e0; border-radius: 15px;
-                display: flex; align-items: center; justify-content: center;
-                font-size: 24px; cursor: pointer;">📊</div>
-</div>
-""",
-    unsafe_allow_html=True,
-)
-
-# ------------- lesson meta and banks -------------
-
-LESSON_META = {
+# Lesson metadata
+LESSONS = {
     "lesson1": {
-        "label": "Lesson 1 · Limit Definition",
-        "title": "Limit Definition of the Derivative",
-        "goal": "Check that you can use the limit definition in simple cases.",
-        "gradient": "linear-gradient(135deg, #FFD4D4 0%, #FFE5E5 100%)",
-        "badge_color": "#DC143C",
+        "title": "Lesson 1: Basic Derivative Rules",
+        "color": "#6B8E23",
+        "topics": ["Power Rule", "Constant Rule", "Sum Rule"]
     },
     "lesson2": {
-        "label": "Lesson 2 · Basic Rules",
-        "title": "Basic Differentiation Rules",
-        "goal": "Power rule and simple combinations.",
-        "gradient": "linear-gradient(135deg, #FFE5D0 0%, #FFF0E0 100%)",
-        "badge_color": "#FF8C00",
+        "title": "Lesson 2: Product & Quotient Rules", 
+        "color": "#7BA428",
+        "topics": ["Product Rule", "Quotient Rule"]
     },
     "lesson3": {
-        "label": "Lesson 3 · Product Rule",
-        "title": "Product Rule",
-        "goal": "Differentiate products of functions.",
-        "gradient": "linear-gradient(135deg, #E5D4FF 0%, #F0E8FF 100%)",
-        "badge_color": "#6B46C1",
+        "title": "Lesson 3: Chain Rule",
+        "color": "#8AB833",
+        "topics": ["Chain Rule", "Composite Functions"]
     },
     "lesson4": {
-        "label": "Lesson 4 · Chain Rule",
-        "title": "Chain Rule",
-        "goal": "Work with composite functions.",
-        "gradient": "linear-gradient(135deg, #D4FFE5 0%, #E5FFF0 100%)",
-        "badge_color": "#10B981",
+        "title": "Lesson 4: Trigonometric Derivatives",
+        "color": "#6B8E23",
+        "topics": ["sin, cos derivatives", "tan, cot derivatives"]
     },
     "lesson5": {
-        "label": "Lesson 5 · Implicit Differentiation",
-        "title": "Implicit Differentiation",
-        "goal": "Differentiate relations that mix x and y.",
-        "gradient": "linear-gradient(135deg, #D4E8FF 0%, #E5F2FF 100%)",
-        "badge_color": "#2196F3",
+        "title": "Lesson 5: Exponential & Logarithmic",
+        "color": "#7BA428",
+        "topics": ["e^x derivatives", "ln(x) derivatives"]
     },
     "lesson6": {
-        "label": "Lesson 6 · Applications",
-        "title": "Applications of Derivatives",
-        "goal": "Use derivatives in concrete problems.",
-        "gradient": "linear-gradient(135deg, #FFF4D4 0%, #FFFAE5 100%)",
-        "badge_color": "#F59E0B",
-    },
+        "title": "Lesson 6: Applications",
+        "color": "#8AB833",
+        "topics": ["Related Rates", "Optimization", "Motion"]
+    }
 }
 
-# Each question has id, difficulty, stem, choices, answer index
-# There are three levels per lesson so you can expand this to sixty later
-
+# Question bank - 10 questions per lesson
 QUESTION_BANKS = {
     "lesson1": [
-        # easy
-        {
-            "id": "L1_E1",
-            "difficulty": "easy",
-            "stem": "For f(x) = x², which expression is the difference quotient at x = a?",
-            "choices": [
-                "(f(a+h) − f(a))/h",
-                "(f(a) − f(h))/a",
-                "(f(a+h) − f(h))/a",
-                "(f(a) − f(a−h))/h",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L1_E2",
-            "difficulty": "easy",
-            "stem": "The derivative at x = a is the limit of the secant slope as",
-            "choices": [
-                "h → 0",
-                "h → 1",
-                "x → ∞",
-                "a → 0",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L1_E3",
-            "difficulty": "easy",
-            "stem": "The derivative of f at a point is best described as",
-            "choices": [
-                "the slope of the tangent line",
-                "the area under the curve",
-                "the x coordinate of the point",
-                "the y intercept of the graph",
-            ],
-            "answer": 0,
-        },
-        # medium
-        {
-            "id": "L1_M1",
-            "difficulty": "medium",
-            "stem": "Use the limit definition to find f'(a) for f(x) = x².",
-            "choices": ["2a", "a²", "a", "4a"],
-            "answer": 0,
-        },
-        {
-            "id": "L1_M2",
-            "difficulty": "medium",
-            "stem": "Use the limit definition to find f'(a) for f(x) = 3x.",
-            "choices": ["3", "3a", "a", "0"],
-            "answer": 0,
-        },
-        {
-            "id": "L1_M3",
-            "difficulty": "medium",
-            "stem": "If f'(2) = 5, what does that tell you about the graph of f at x = 2?",
-            "choices": [
-                "The tangent line at x = 2 has slope 5.",
-                "The tangent line at x = 5 has slope 2.",
-                "The point (2,5) is on the graph.",
-                "The graph crosses the x axis at x = 5.",
-            ],
-            "answer": 0,
-        },
-        # hard
-        {
-            "id": "L1_H1",
-            "difficulty": "hard",
-            "stem": "For f(x) = √x, use the limit definition to find f'(a).",
-            "choices": [
-                "1/(2√a)",
-                "√a",
-                "1/√a",
-                "2√a",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L1_H2",
-            "difficulty": "hard",
-            "stem": "For f(x) = |x|, what can you say about f'(0)?",
-            "choices": [
-                "The derivative does not exist at 0.",
-                "f'(0) = 0.",
-                "f'(0) = 1.",
-                "f'(0) = −1.",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L1_H3",
-            "difficulty": "hard",
-            "stem": "Which statement is true?",
-            "choices": [
-                "If f is differentiable at a then f is continuous at a.",
-                "If f is continuous at a then f is differentiable at a.",
-                "Every function is differentiable everywhere.",
-                "Differentiability and continuity are unrelated.",
-            ],
-            "answer": 0,
-        },
+        {"q": "What is the derivative of x³?", "choices": ["3x²", "x²", "3x", "x³"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is the derivative of 5?", "choices": ["0", "5", "5x", "1"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is d/dx(x⁴)?", "choices": ["4x³", "x³", "4x⁴", "x⁴"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is the derivative of 2x?", "choices": ["2", "2x", "x", "0"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is d/dx(x² + x)?", "choices": ["2x + 1", "2x", "x + 1", "2x² + x"], "answer": 0, "difficulty": "medium"},
+        {"q": "What is the derivative of 3x² - 5x + 7?", "choices": ["6x - 5", "6x - 5x", "3x - 5", "6x²"], "answer": 0, "difficulty": "medium"},
+        {"q": "Find d/dx(x⁵ - 2x³ + x):", "choices": ["5x⁴ - 6x² + 1", "5x⁴ - 2x²", "x⁴ - 2x² + 1", "5x⁴ - 6x²"], "answer": 0, "difficulty": "medium"},
+        {"q": "What is the derivative of √x?", "choices": ["1/(2√x)", "2√x", "√x/2", "1/√x"], "answer": 0, "difficulty": "hard"},
+        {"q": "Find d/dx(1/x²):", "choices": ["-2/x³", "2/x³", "-1/x²", "1/x³"], "answer": 0, "difficulty": "hard"},
+        {"q": "What is d/dx(x^(2/3))?", "choices": ["(2/3)x^(-1/3)", "(2/3)x^(2/3)", "x^(-1/3)", "(3/2)x^(1/3)"], "answer": 0, "difficulty": "hard"},
     ],
     "lesson2": [
-        # easy
-        {
-            "id": "L2_E1",
-            "difficulty": "easy",
-            "stem": "Differentiate f(x) = x³.",
-            "choices": ["3x²", "x²", "3x³", "x"],
-            "answer": 0,
-        },
-        {
-            "id": "L2_E2",
-            "difficulty": "easy",
-            "stem": "Differentiate f(x) = 7.",
-            "choices": ["0", "7", "1", "x"],
-            "answer": 0,
-        },
-        {
-            "id": "L2_E3",
-            "difficulty": "easy",
-            "stem": "Differentiate f(x) = 4x.",
-            "choices": ["4", "x", "4x²", "0"],
-            "answer": 0,
-        },
-        # medium
-        {
-            "id": "L2_M1",
-            "difficulty": "medium",
-            "stem": "Differentiate f(x) = 5x³ − 4x + 7.",
-            "choices": ["15x² − 4", "5x² − 4", "15x³ − 4", "15x² − 4x"],
-            "answer": 0,
-        },
-        {
-            "id": "L2_M2",
-            "difficulty": "medium",
-            "stem": "Write f'(x) if f(x) = 2x^(1/2) + x^(−2).",
-            "choices": [
-                "x^(−1/2) − 2x^(−3)",
-                "2x^(−1/2) − 2x^(−2)",
-                "x^(1/2) − 2x^(−3)",
-                "x^(−1/2) − x^(−3)",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L2_M3",
-            "difficulty": "medium",
-            "stem": "Differentiate f(x) = 3x⁴ − x².",
-            "choices": ["12x³ − 2x", "12x² − 2x", "3x³ − 2x", "12x³ − x"],
-            "answer": 0,
-        },
-        # hard
-        {
-            "id": "L2_H1",
-            "difficulty": "hard",
-            "stem": "Find f'(x) for f(x) = x^(3/2).",
-            "choices": [
-                "(3/2)x^(1/2)",
-                "(1/2)x^(−1/2)",
-                "(3/2)x^(−1/2)",
-                "3x^(1/2)",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L2_H2",
-            "difficulty": "hard",
-            "stem": "Differentiate f(x) = (2/x³) − √x.",
-            "choices": [
-                "-6/x⁴ − 1/(2√x)",
-                "-6/x² − 1/(2√x)",
-                "6/x⁴ − 1/(2√x)",
-                "6/x³ − 1/(2√x)",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L2_H3",
-            "difficulty": "hard",
-            "stem": "If f(x) = x⁴ − 3x², what is f'(2)?",
-            "choices": ["20", "10", "32", "8"],
-            "answer": 0,
-        },
+        {"q": "Using product rule, find d/dx(x·x²):", "choices": ["3x²", "2x²", "x³", "x²"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is the product rule formula?", "choices": ["uv' + vu'", "uv'", "u'v'", "(uv)'"], "answer": 0, "difficulty": "easy"},
+        {"q": "Find d/dx(x² · x³):", "choices": ["5x⁴", "6x⁵", "5x⁵", "x⁵"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is the quotient rule formula?", "choices": ["(vu' - uv')/v²", "(u'v - uv')/v²", "u'/v'", "(uv')/v²"], "answer": 0, "difficulty": "easy"},
+        {"q": "Find d/dx(x · sin x):", "choices": ["x·cos x + sin x", "x·cos x", "cos x + sin x", "x·sin x"], "answer": 0, "difficulty": "medium"},
+        {"q": "Find d/dx((x²)(e^x)):", "choices": ["e^x(x² + 2x)", "2x·e^x", "x²·e^x", "e^x(2x)"], "answer": 0, "difficulty": "medium"},
+        {"q": "What is d/dx(x/x²)?", "choices": ["-1/x²", "1/x²", "0", "1/x"], "answer": 0, "difficulty": "medium"},
+        {"q": "Find d/dx((3x² + 1)(2x - 5)):", "choices": ["12x² - 30x + 2", "6x - 5", "12x² + 2", "6x² - 15x"], "answer": 0, "difficulty": "hard"},
+        {"q": "Find d/dx(x²/sin x):", "choices": ["(2x·sin x - x²·cos x)/sin² x", "2x/cos x", "2x/sin x", "x²/cos x"], "answer": 0, "difficulty": "hard"},
+        {"q": "Using product rule, find d/dx(x³·ln x):", "choices": ["x²(3ln x + 1)", "3x²·ln x", "x³/x + 3x²·ln x", "3x²"], "answer": 0, "difficulty": "hard"},
     ],
     "lesson3": [
-        # easy
-        {
-            "id": "L3_E1",
-            "difficulty": "easy",
-            "stem": "State the product rule for f(x) = u(x)v(x).",
-            "choices": [
-                "f' = u'v + uv'",
-                "f' = u'v'",
-                "f' = uv",
-                "f' = u + v",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L3_E2",
-            "difficulty": "easy",
-            "stem": "In words, the product rule is",
-            "choices": [
-                "derivative of first times second plus first times derivative of second",
-                "multiply the two derivatives",
-                "add the original functions",
-                "take the derivative of the ratio",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L3_E3",
-            "difficulty": "easy",
-            "stem": "Which is a product that needs the product rule?",
-            "choices": [
-                "x² sin x",
-                "x² + sin x",
-                "sin(x²)",
-                "1/x",
-            ],
-            "answer": 0,
-        },
-        # medium
-        {
-            "id": "L3_M1",
-            "difficulty": "medium",
-            "stem": "Differentiate f(x) = x² sin x.",
-            "choices": [
-                "2x sin x + x² cos x",
-                "2x sin x",
-                "x² cos x",
-                "cos x",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L3_M2",
-            "difficulty": "medium",
-            "stem": "Differentiate f(x) = x³ e^x.",
-            "choices": [
-                "3x² e^x + x³ e^x",
-                "3x² e^x",
-                "x³ e^x",
-                "e^x",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L3_M3",
-            "difficulty": "medium",
-            "stem": "Differentiate f(x) = (2x)(ln x).",
-            "choices": [
-                "2 ln x + 2",
-                "2 ln x",
-                "2/x + ln x",
-                "2x/x",
-            ],
-            "answer": 0,
-        },
-        # hard
-        {
-            "id": "L3_H1",
-            "difficulty": "hard",
-            "stem": "Differentiate f(x) = x² e^x sin x (treat as product of three).",
-            "choices": [
-                "x² e^x cos x + 2x e^x sin x + x² e^x sin x",
-                "2x e^x sin x",
-                "x² e^x cos x",
-                "2x e^x cos x",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L3_H2",
-            "difficulty": "hard",
-            "stem": "Differentiate f(x) = (x² + 1)(x³ − x).",
-            "choices": [
-                "2x(x³ − x) + (x² + 1)(3x² − 1)",
-                "2x(x³ − x) + 3x² − 1",
-                "(x² + 1)(3x² − 1)",
-                "2x + 3x² − 1",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L3_H3",
-            "difficulty": "hard",
-            "stem": "Which mistake is most common when students misapply the product rule?",
-            "choices": [
-                "Using u'v' instead of u'v + uv'.",
-                "Taking no derivative at all.",
-                "Only differentiating v.",
-                "Only differentiating u and v in the numerator.",
-            ],
-            "answer": 0,
-        },
+        {"q": "What is the chain rule formula?", "choices": ["f'(g(x))·g'(x)", "f'(x)·g'(x)", "f(g'(x))", "f'(x) + g'(x)"], "answer": 0, "difficulty": "easy"},
+        {"q": "Find d/dx((x²)³):", "choices": ["6x⁵", "3x⁵", "6x²", "2x⁵"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is d/dx(sin(2x))?", "choices": ["2cos(2x)", "cos(2x)", "2sin(2x)", "-2cos(2x)"], "answer": 0, "difficulty": "easy"},
+        {"q": "Find d/dx((3x + 1)²):", "choices": ["6(3x + 1)", "2(3x + 1)", "6x + 1", "3(3x + 1)"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is d/dx(e^(2x))?", "choices": ["2e^(2x)", "e^(2x)", "2e^x", "e^(2x²)"], "answer": 0, "difficulty": "medium"},
+        {"q": "Find d/dx(sin(x²)):", "choices": ["2x·cos(x²)", "cos(x²)", "2x·sin(x²)", "sin(2x)"], "answer": 0, "difficulty": "medium"},
+        {"q": "What is d/dx((x² + 1)⁵)?", "choices": ["10x(x² + 1)⁴", "5(x² + 1)⁴", "10x⁴", "5x(x² + 1)⁴"], "answer": 0, "difficulty": "medium"},
+        {"q": "Find d/dx(ln(x³)):", "choices": ["3/x", "1/x³", "3x²", "ln(3x²)"], "answer": 0, "difficulty": "hard"},
+        {"q": "What is d/dx(e^(sin x))?", "choices": ["e^(sin x)·cos x", "e^(sin x)", "e^(cos x)", "cos x"], "answer": 0, "difficulty": "hard"},
+        {"q": "Find d/dx(sin(cos x)):", "choices": ["-sin x·cos(cos x)", "cos(cos x)", "-cos(cos x)", "sin x·cos(cos x)"], "answer": 0, "difficulty": "hard"},
     ],
     "lesson4": [
-        # easy
-        {
-            "id": "L4_E1",
-            "difficulty": "easy",
-            "stem": "State the chain rule for f(x) = f(g(x)).",
-            "choices": [
-                "f'(g(x)) g'(x)",
-                "f'(x) g'(x)",
-                "f(g'(x))",
-                "g'(x)/f(x)",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L4_E2",
-            "difficulty": "easy",
-            "stem": "In words, the chain rule says",
-            "choices": [
-                "derivative of the outer times derivative of the inner",
-                "add the derivatives of each part",
-                "divide the derivatives",
-                "multiply the original functions",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L4_E3",
-            "difficulty": "easy",
-            "stem": "Which function clearly needs the chain rule?",
-            "choices": [
-                "(3x² + 1)⁴",
-                "x² + 1",
-                "3x²",
-                "x⁴",
-            ],
-            "answer": 0,
-        },
-        # medium
-        {
-            "id": "L4_M1",
-            "difficulty": "medium",
-            "stem": "Differentiate f(x) = (3x² + 1)⁴.",
-            "choices": [
-                "24x(3x² + 1)³",
-                "4(3x² + 1)³",
-                "12x(3x² + 1)⁴",
-                "(3x² + 1)³",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L4_M2",
-            "difficulty": "medium",
-            "stem": "Differentiate f(x) = sin(5x²).",
-            "choices": [
-                "10x cos(5x²)",
-                "cos(5x²)",
-                "5 cos(5x²)",
-                "10x sin(5x²)",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L4_M3",
-            "difficulty": "medium",
-            "stem": "Differentiate f(x) = e^(2x).",
-            "choices": [
-                "2e^(2x)",
-                "e^(2x)",
-                "2e^x",
-                "e^x",
-            ],
-            "answer": 0,
-        },
-        # hard
-        {
-            "id": "L4_H1",
-            "difficulty": "hard",
-            "stem": "Differentiate f(x) = sin(cos(x²)).",
-            "choices": [
-                "cos(cos(x²)) (−sin(x²)) 2x",
-                "cos(cos(x²)) 2x",
-                "sin(cos(x²)) 2x",
-                "cos(x²) (−sin(x²))",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L4_H2",
-            "difficulty": "hard",
-            "stem": "Differentiate f(x) = √(4x² + 1).",
-            "choices": [
-                "(4x)/(√(4x² + 1))",
-                "2√(4x² + 1)",
-                "1/(2√(4x² + 1))",
-                "4/(√(4x² + 1))",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L4_H3",
-            "difficulty": "hard",
-            "stem": "Differentiate f(x) = (5x³ − x)¹⁰.",
-            "choices": [
-                "10(5x³ − x)⁹(15x² − 1)",
-                "10(5x³ − x)⁹",
-                "15x² − 1",
-                "(5x³ − x)¹⁰(15x² − 1)",
-            ],
-            "answer": 0,
-        },
+        {"q": "What is d/dx(sin x)?", "choices": ["cos x", "-cos x", "sin x", "-sin x"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is d/dx(cos x)?", "choices": ["-sin x", "sin x", "cos x", "-cos x"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is d/dx(tan x)?", "choices": ["sec² x", "sec x·tan x", "csc² x", "cos² x"], "answer": 0, "difficulty": "easy"},
+        {"q": "Find d/dx(sin x + cos x):", "choices": ["cos x - sin x", "sin x - cos x", "cos x + sin x", "-sin x - cos x"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is d/dx(sin(2x))?", "choices": ["2cos(2x)", "cos(2x)", "-2sin(2x)", "2sin(2x)"], "answer": 0, "difficulty": "medium"},
+        {"q": "Find d/dx(x·sin x):", "choices": ["x·cos x + sin x", "x·cos x", "cos x", "sin x + cos x"], "answer": 0, "difficulty": "medium"},
+        {"q": "What is d/dx(sin² x)?", "choices": ["2sin x·cos x", "sin(2x)", "cos² x", "2sin x"], "answer": 0, "difficulty": "medium"},
+        {"q": "Find d/dx(tan(x²)):", "choices": ["2x·sec²(x²)", "sec²(x²)", "2x·tan(x²)", "sec²(2x)"], "answer": 0, "difficulty": "hard"},
+        {"q": "What is d/dx(sec x)?", "choices": ["sec x·tan x", "sec² x", "-csc x·cot x", "tan x"], "answer": 0, "difficulty": "hard"},
+        {"q": "Find d/dx(sin x/cos x):", "choices": ["sec² x", "1", "tan x", "sec x"], "answer": 0, "difficulty": "hard"},
     ],
     "lesson5": [
-        # easy
-        {
-            "id": "L5_E1",
-            "difficulty": "easy",
-            "stem": "In implicit differentiation, whenever you differentiate y you must",
-            "choices": [
-                "multiply by dy/dx",
-                "set it equal to zero",
-                "leave it unchanged",
-                "treat it as a constant",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L5_E2",
-            "difficulty": "easy",
-            "stem": "Implicit differentiation is used when",
-            "choices": [
-                "y is not isolated as a function of x",
-                "x is constant",
-                "y never appears",
-                "the function is linear",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L5_E3",
-            "difficulty": "easy",
-            "stem": "Differentiate x² with respect to x.",
-            "choices": ["2x", "x²", "2", "0"],
-            "answer": 0,
-        },
-        # medium
-        {
-            "id": "L5_M1",
-            "difficulty": "medium",
-            "stem": "For x² + y² = 25, find dy/dx.",
-            "choices": [
-                "−x/y",
-                "x/y",
-                "−y/x",
-                "y/x",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L5_M2",
-            "difficulty": "medium",
-            "stem": "For xy = 1, what is dy/dx?",
-            "choices": [
-                "−y/x",
-                "−x/y",
-                "1/(xy)",
-                "x/y",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L5_M3",
-            "difficulty": "medium",
-            "stem": "For x² + xy + y² = 7, which line is correct after differentiating?",
-            "choices": [
-                "2x + y + x dy/dx + 2y dy/dx = 0",
-                "2x + 2y dy/dx = 0",
-                "2x + y dy/dx + 2y = 0",
-                "x + y + 2y dy/dx = 0",
-            ],
-            "answer": 0,
-        },
-        # hard
-        {
-            "id": "L5_H1",
-            "difficulty": "hard",
-            "stem": "From 2x + y + x dy/dx + 2y dy/dx = 0, solve for dy/dx.",
-            "choices": [
-                "dy/dx = (−2x − y)/(x + 2y)",
-                "dy/dx = (2x + y)/(x + 2y)",
-                "dy/dx = (−2x − y)/(2x + y)",
-                "dy/dx = (2x + y)/(2x + y)",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L5_H2",
-            "difficulty": "hard",
-            "stem": "For x² − y² = 1, what is dy/dx?",
-            "choices": [
-                "x/y",
-                "−x/y",
-                "−y/x",
-                "y/x",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L5_H3",
-            "difficulty": "hard",
-            "stem": "For sin(x + y) = x, which equation is correct after differentiating?",
-            "choices": [
-                "cos(x + y)(1 + dy/dx) = 1",
-                "cos(x + y) dy/dx = 1",
-                "sin(x + y)(1 + dy/dx) = 1",
-                "cos(x + y) = 1 + dy/dx",
-            ],
-            "answer": 0,
-        },
+        {"q": "What is d/dx(e^x)?", "choices": ["e^x", "xe^(x-1)", "e", "x·e^x"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is d/dx(ln x)?", "choices": ["1/x", "ln x", "x", "1/ln x"], "answer": 0, "difficulty": "easy"},
+        {"q": "Find d/dx(2e^x):", "choices": ["2e^x", "e^x", "2e", "2x·e^x"], "answer": 0, "difficulty": "easy"},
+        {"q": "What is d/dx(ln(2x))?", "choices": ["1/x", "2/x", "1/(2x)", "ln 2"], "answer": 0, "difficulty": "easy"},
+        {"q": "Find d/dx(e^(2x)):", "choices": ["2e^(2x)", "e^(2x)", "2e^x", "e^(2x²)"], "answer": 0, "difficulty": "medium"},
+        {"q": "What is d/dx(x·e^x)?", "choices": ["e^x(x + 1)", "x·e^x", "e^x", "x·e^(x+1)"], "answer": 0, "difficulty": "medium"},
+        {"q": "Find d/dx(ln(x²)):", "choices": ["2/x", "1/x²", "2x", "ln(2x)"], "answer": 0, "difficulty": "medium"},
+        {"q": "What is d/dx(e^(x²))?", "choices": ["2x·e^(x²)", "e^(x²)", "2e^(x²)", "x²·e^(x²-1)"], "answer": 0, "difficulty": "hard"},
+        {"q": "Find d/dx(ln(sin x)):", "choices": ["cot x", "1/sin x", "cos x/sin x", "1/cos x"], "answer": 0, "difficulty": "hard"},
+        {"q": "What is d/dx(x^x)?", "choices": ["x^x(ln x + 1)", "x·x^(x-1)", "x^x·ln x", "x^x"], "answer": 0, "difficulty": "hard"},
     ],
     "lesson6": [
-        # easy
-        {
-            "id": "L6_E1",
-            "difficulty": "easy",
-            "stem": "The slope of the tangent line to y = f(x) at x = a is",
-            "choices": [
-                "f'(a)",
-                "f(a)",
-                "a",
-                "f(a)/a",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L6_E2",
-            "difficulty": "easy",
-            "stem": "If s(t) is position, then s'(t) represents",
-            "choices": [
-                "velocity",
-                "acceleration",
-                "distance",
-                "time",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L6_E3",
-            "difficulty": "easy",
-            "stem": "If v(t) is velocity, then v'(t) is",
-            "choices": [
-                "acceleration",
-                "position",
-                "displacement",
-                "time",
-            ],
-            "answer": 0,
-        },
-        # medium
-        {
-            "id": "L6_M1",
-            "difficulty": "medium",
-            "stem": "Find the equation of the tangent line to f(x) = x² at x = 2.",
-            "choices": [
-                "y = 4x − 4",
-                "y = 2x + 4",
-                "y = x²",
-                "y = 4x + 4",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L6_M2",
-            "difficulty": "medium",
-            "stem": "For s(t) = t³ − 6t² + 9t, find v(t).",
-            "choices": [
-                "3t² − 12t + 9",
-                "3t² − 6t + 9",
-                "t² − 6t + 9",
-                "3t³ − 12t² + 9",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L6_M3",
-            "difficulty": "medium",
-            "stem": "For h(t) = −16t² + 64t + 5, when does the maximum height occur?",
-            "choices": [
-                "t = 2",
-                "t = 0",
-                "t = 4",
-                "t = 1",
-            ],
-            "answer": 0,
-        },
-        # hard
-        {
-            "id": "L6_H1",
-            "difficulty": "hard",
-            "stem": "For h(t) = −16t² + 64t + 5, what is the maximum height?",
-            "choices": [
-                "69",
-                "64",
-                "5",
-                "80",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L6_H2",
-            "difficulty": "hard",
-            "stem": "If C(q) is cost and C'(q) is marginal cost, then C'(100) ≈ 25 means",
-            "choices": [
-                "producing one more unit at q = 100 costs about 25",
-                "total cost at q = 100 is 25",
-                "average cost at q = 100 is 25",
-                "the company makes 25 units",
-            ],
-            "answer": 0,
-        },
-        {
-            "id": "L6_H3",
-            "difficulty": "hard",
-            "stem": "You are told that f'(x) changes sign from positive to negative at x = 3. What does this say about f?",
-            "choices": [
-                "f has a local maximum at x = 3",
-                "f has a local minimum at x = 3",
-                "f is always decreasing",
-                "f is always increasing",
-            ],
-            "answer": 0,
-        },
-    ],
+        {"q": "If s(t) = t², what is velocity v(t)?", "choices": ["2t", "t²", "t", "2"], "answer": 0, "difficulty": "easy"},
+        {"q": "If v(t) is velocity, what is v'(t)?", "choices": ["acceleration", "position", "jerk", "speed"], "answer": 0, "difficulty": "easy"},
+        {"q": "For optimization, where do max/min occur?", "choices": ["Where f'(x) = 0", "Where f(x) = 0", "Endpoints only", "Where f''(x) = 0"], "answer": 0, "difficulty": "easy"},
+        {"q": "If position s = t³, find acceleration at t=2:", "choices": ["12", "6", "8", "4"], "answer": 0, "difficulty": "easy"},
+        {"q": "A ladder slides down a wall. This is an example of:", "choices": ["Related rates", "Optimization", "Linear motion", "Integration"], "answer": 0, "difficulty": "medium"},
+        {"q": "To maximize area, what do we do with A'(x)?", "choices": ["Set it equal to 0", "Set it equal to 1", "Integrate it", "Differentiate it"], "answer": 0, "difficulty": "medium"},
+        {"q": "If f'(c) = 0 and f''(c) > 0, then f has a:", "choices": ["local minimum at c", "local maximum at c", "inflection point at c", "discontinuity at c"], "answer": 0, "difficulty": "medium"},
+        {"q": "For h(t) = -16t² + 64t, when is max height?", "choices": ["t = 2", "t = 4", "t = 0", "t = 1"], "answer": 0, "difficulty": "hard"},
+        {"q": "If C(x) = 100 + 2x is cost, what is marginal cost?", "choices": ["2", "100", "2x", "102"], "answer": 0, "difficulty": "hard"},
+        {"q": "A box with square base, volume 32. Minimize surface area. If side = x, height h = 32/x². What is S'(x)?", "choices": ["2x - 64/x²", "2x + 64/x²", "x² - 32/x", "2x"], "answer": 0, "difficulty": "hard"},
+    ]
 }
 
+
 def main():
-    """Main function for lesson quizzes"""
-    apply_quiz_styles()
+    """Main lesson quiz page"""
+    st.markdown("""
+    <style>
+        /* Dark theme consistency */
+        .main-title {
+            font-size: 36px;
+            font-weight: 900;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #B3B3B3;
+            margin-bottom: 30px;
+        }
+        .lesson-card {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+            border-left: 4px solid #6B8E23;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .question-card {
+            background: #2d2d2d;
+            border: 2px solid #404040;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .question-number {
+            color: #6B8E23;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .question-text {
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .difficulty-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+        .diff-easy { background: #58CC02; color: #000; }
+        .diff-medium { background: #FFC800; color: #000; }
+        .diff-hard { background: #FF4B4B; color: #FFF; }
+        .result-box {
+            background: linear-gradient(135deg, #6B8E23 0%, #556B2F 100%);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .result-score {
+            font-size: 72px;
+            font-weight: 900;
+            color: #FFFFFF;
+        }
+        .result-text {
+            font-size: 18px;
+            color: #E0E0E0;
+            margin-top: 10px;
+        }
+    </style>
+    """, unsafe_allow_html=True)
     
-    # ------------- header -------------
+    # Header
+    st.markdown('<div class="main-title">📝 Lesson Quizzes</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subtitle">Test your knowledge with 10-question ML-adaptive quizzes</div>', unsafe_allow_html=True)
     
-    st.markdown(
-        '<h1 class="main-header">Lesson Quizzes</h1>',
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        '<p class="sub-header">Master each lesson with ML-adaptive quizzes that adjust to your skill level.</p>',
-        unsafe_allow_html=True,
-    )
-    
-    lesson_labels = [meta["label"] for meta in LESSON_META.values()]
-    lesson_keys = list(LESSON_META.keys())
-    
-    # Auto-select lesson if coming from a specific lesson page
-    default_lesson = st.session_state.get('quiz_lesson_id', None)
-    default_index = 0
-    if default_lesson and default_lesson in lesson_keys:
-        default_index = lesson_keys.index(default_lesson)
-        # Clear after using
-        if 'quiz_lesson_id' in st.session_state:
-            del st.session_state['quiz_lesson_id']
-    
-    selected_label = st.selectbox(
-        "Choose a lesson to quiz yourself on",
-        options=lesson_labels,
-        index=default_index,
-    )
-    
-    selected_key = lesson_keys[lesson_labels.index(selected_label)]
-    meta = LESSON_META[selected_key]
-    questions = QUESTION_BANKS[selected_key]
-    
-    # ------------- lesson header card -------------
-    
-    st.markdown(
-        f"""
-<div class="quiz-header-card" style="background: {meta['gradient']};">
-    <div class="lesson-badge" style="color: {meta['badge_color']};">
-        {meta['label']}
-    </div>
-    <div class="quiz-title">{meta['title']}</div>
-    <div class="quiz-goal">{meta['goal']}</div>
-    <div class="quiz-meta">🤖 <strong>ML-Adaptive Quiz:</strong> This quiz intelligently selects 5 questions based on your performance. Master easy questions to unlock harder ones!</div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-    
-    # adaptive question selection
-    def select_adaptive_questions(lesson_key, all_questions, username):
-        # get past performance
-        progress = DataManager.get_user_progress(username) if username else {}
-        lesson_history = progress.get('lesson_quizzes', {}).get(lesson_key, {})
-        
-        easy_q = [q for q in all_questions if q['difficulty'] == 'easy']
-        medium_q = [q for q in all_questions if q['difficulty'] == 'medium']
-        hard_q = [q for q in all_questions if q['difficulty'] == 'hard']
-        
-        selected = []
-        past_score = lesson_history.get('best_score_pct', 0)
-        
-        if past_score == 0:
-            # first try - start easier
-            selected.extend(random.sample(easy_q, min(2, len(easy_q))))
-            selected.extend(random.sample(medium_q, min(2, len(medium_q))))
-            selected.extend(random.sample(hard_q, min(1, len(hard_q))))
-        elif past_score < 60:
-            selected.extend(random.sample(easy_q, min(2, len(easy_q))))
-            selected.extend(random.sample(medium_q, min(2, len(medium_q))))
-            selected.extend(random.sample(hard_q, min(1, len(hard_q))))
-        elif past_score < 80:
-            selected.extend(random.sample(easy_q, min(1, len(easy_q))))
-            selected.extend(random.sample(medium_q, min(2, len(medium_q))))
-            selected.extend(random.sample(hard_q, min(2, len(hard_q))))
-        else:
-            selected.extend(random.sample(easy_q, min(1, len(easy_q))))
-            selected.extend(random.sample(medium_q, min(1, len(medium_q))))
-            selected.extend(random.sample(hard_q, min(3, len(hard_q))))
-        
-        while len(selected) < 5 and len(all_questions) > len(selected):
-            remaining = [q for q in all_questions if q not in selected]
-            if remaining:
-                selected.append(random.choice(remaining))
-    
-        return selected[:5]
-    
+    # Get username
     username = st.session_state.get('username', 'guest')
     
-    # select questions
-    questions = select_adaptive_questions(selected_key, questions, username)
+    # Lesson selection
+    lesson_options = [LESSONS[key]["title"] for key in LESSONS.keys()]
+    lesson_keys = list(LESSONS.keys())
     
-    st.info(f"🤖 **Adaptive Selection:** Based on your performance, we've selected {len(questions)} questions tailored to your skill level.")
+    # Check if coming from a specific lesson
+    default_index = 0
+    if 'quiz_lesson_id' in st.session_state:
+        target_lesson = st.session_state['quiz_lesson_id']
+        if target_lesson in lesson_keys:
+            default_index = lesson_keys.index(target_lesson)
+        del st.session_state['quiz_lesson_id']  # Clear it after use
     
-    answers = {}
-    correct_flags = {}
-    
-    for idx, q in enumerate(questions, start=1):
-        difficulty = q["difficulty"]
-        diff_class = (
-            "difficulty-easy"
-            if difficulty == "easy"
-            else "difficulty-medium"
-            if difficulty == "medium"
-            else "difficulty-hard"
-        )
-        
-        st.markdown(
-        f"""
-<div class="quiz-card">
-    <div class="question-header">
-        <div>Question {idx}</div>
-        <div class="difficulty-badge {diff_class}">{difficulty.capitalize()}</div>
-    </div>
-    <div class="question-stem">{q['stem']}</div>
-</div>
-""",
-        unsafe_allow_html=True,
+    selected_title = st.selectbox(
+        "**Choose a lesson:**",
+        options=lesson_options,
+        index=default_index,
+        key="lesson_selector"
     )
-
-        choice = st.radio(
-            "",
-            q["choices"],
-            key=f"{selected_key}_{q['id']}",
+    
+    lesson_key = lesson_keys[lesson_options.index(selected_title)]
+    lesson = LESSONS[lesson_key]
+    questions = QUESTION_BANKS[lesson_key]
+    
+    # Lesson header
+    st.markdown(f"""
+    <div class="lesson-card">
+        <h2 style="color: {lesson['color']}; margin: 0 0 10px 0;">{lesson['title']}</h2>
+        <p style="color: #B3B3B3; margin: 0;">Topics: {', '.join(lesson['topics'])}</p>
+        <p style="color: #6B8E23; margin: 10px 0 0 0; font-size: 13px;">
+            🤖 <strong>ML-Adaptive:</strong> Questions intelligently selected based on your performance
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Get user's past performance for adaptive selection
+    progress = DataManager.get_user_progress(username)
+    lesson_history = progress.get('lesson_quizzes', {}).get(lesson_key, {})
+    past_score = lesson_history.get('best_score_pct', 0)
+    
+    # Adaptive question selection (10 questions)
+    easy_q = [q for q in questions if q['difficulty'] == 'easy']
+    medium_q = [q for q in questions if q['difficulty'] == 'medium']
+    hard_q = [q for q in questions if q['difficulty'] == 'hard']
+    
+    selected_questions = []
+    if past_score == 0:  # First attempt
+        selected_questions.extend(random.sample(easy_q, min(4, len(easy_q))))
+        selected_questions.extend(random.sample(medium_q, min(4, len(medium_q))))
+        selected_questions.extend(random.sample(hard_q, min(2, len(hard_q))))
+    elif past_score < 50:  # Struggling
+        selected_questions.extend(random.sample(easy_q, min(5, len(easy_q))))
+        selected_questions.extend(random.sample(medium_q, min(3, len(medium_q))))
+        selected_questions.extend(random.sample(hard_q, min(2, len(hard_q))))
+    elif past_score < 80:  # Improving
+        selected_questions.extend(random.sample(easy_q, min(3, len(easy_q))))
+        selected_questions.extend(random.sample(medium_q, min(4, len(medium_q))))
+        selected_questions.extend(random.sample(hard_q, min(3, len(hard_q))))
+    else:  # Mastering
+        selected_questions.extend(random.sample(easy_q, min(2, len(easy_q))))
+        selected_questions.extend(random.sample(medium_q, min(3, len(medium_q))))
+        selected_questions.extend(random.sample(hard_q, min(5, len(hard_q))))
+    
+    # Fill to 10 if needed
+    while len(selected_questions) < 10 and len(selected_questions) < len(questions):
+        remaining = [q for q in questions if q not in selected_questions]
+        if remaining:
+            selected_questions.append(random.choice(remaining))
+    
+    selected_questions = selected_questions[:10]
+    
+    # Shuffle
+    random.shuffle(selected_questions)
+    
+    # Show adaptive info
+    st.info(f"🤖 **Adaptive Selection:** Based on your performance (best: {past_score}%), we've selected 10 questions tailored to your skill level.")
+    
+    # Display questions - NO pre-filled answers
+    answers = {}
+    for idx, q in enumerate(selected_questions, 1):
+        diff_class = f"diff-{q['difficulty']}"
+        
+        st.markdown(f"""
+        <div class="question-card">
+            <div class="question-number">
+                Question {idx}
+                <span class="difficulty-badge {diff_class}">{q['difficulty']}</span>
+            </div>
+            <div class="question-text">{q['q']}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Radio buttons with unique keys - NO default index
+        answer = st.radio(
+            f"Select your answer for Question {idx}:",
+            options=q['choices'],
+            key=f"q_{lesson_key}_{idx}_{q['q'][:20]}",  # Unique key per question
             label_visibility="collapsed",
+            index=None  # NO PRE-SELECTION
         )
-        answers[q["id"]] = choice
+        answers[idx] = answer
     
-    submit = st.button("Submit lesson quiz")
-
-    if submit:
-        total = len(questions)
-        correct_count = 0
-        easy_correct = 0
-        easy_total = 0
-        medium_correct = 0
-        medium_total = 0
-        hard_correct = 0
-        hard_total = 0
-        topic_performance = {}
-        
-        for q in questions:
-            picked = answers.get(q["id"])
-            picked_index = q["choices"].index(picked) if picked in q["choices"] else None
-            is_correct = picked_index == q["answer"]
-            correct_flags[q["id"]] = is_correct
-            
-            if q["difficulty"] == "easy":
-                easy_total += 1
-                if is_correct:
-                    easy_correct += 1
-            elif q["difficulty"] == "medium":
-                medium_total += 1
-                if is_correct:
-                    medium_correct += 1
-            else:
-                hard_total += 1
-                if is_correct:
-                    hard_correct += 1
-            
-            if is_correct:
-                correct_count += 1
-        
-        pct = round(100 * correct_count / total) if total > 0 else 0
-        
-        # save results
-        if username != 'guest':
-            DataManager.update_progress(
-            username,
-            'lesson_quizzes',
-            {
-                selected_key: {
-                    'completed': True,
-                    'score': correct_count,
-                    'total': total,
-                    'score_pct': pct,
-                    'best_score_pct': max(pct, DataManager.get_user_progress(username).get('lesson_quizzes', {}).get(selected_key, {}).get('best_score_pct', 0)),
-                    'easy_score': f"{easy_correct}/{easy_total}",
-                    'medium_score': f"{medium_correct}/{medium_total}",
-                    'hard_score': f"{hard_correct}/{hard_total}",
-                    'date': datetime.now().isoformat(),
-                    'attempts': DataManager.get_user_progress(username).get('lesson_quizzes', {}).get(selected_key, {}).get('attempts', 0) + 1
-                }
-            }
-            )
-        
-        performance_level = "Mastering" if pct >= 80 else "Improving" if pct >= 60 else "Learning"
-        difficulty_trend = ""
-        next_steps = ""
-        
-        if easy_total > 0 and easy_correct == easy_total and medium_correct >= medium_total * 0.8:
-            difficulty_trend = "📈 Strong foundation! You're ready for more challenging questions."
-            next_steps = "Your next quiz will include more hard questions to challenge you."
-        elif easy_correct < easy_total * 0.6:
-            difficulty_trend = "📚 Focus on fundamentals. Review the lesson content for this topic."
-            next_steps = "Your next quiz will focus on easier questions to build your foundation."
-        elif hard_total > 0 and hard_correct >= hard_total * 0.6:
-            difficulty_trend = "🌟 Excellent! You're mastering advanced concepts."
-            next_steps = "Keep challenging yourself with complex problems!"
+    # Submit button
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("📤 Submit Quiz", type="primary", use_container_width=True):
+        # Check if all answered
+        if None in answers.values() or len([a for a in answers.values() if a]) < 10:
+            st.error("⚠️ Please answer all 10 questions before submitting!")
         else:
-            difficulty_trend = "💪 Good progress! Keep practicing to improve."
-            next_steps = "Your next quiz will adapt to help you improve further."
-        
-        st.markdown(
-        f"""
-<div class="result-box">
-    <div class="result-score">{pct}%</div>
-    <div class="result-text">
-        You answered {correct_count} out of {total} correctly. <strong>{performance_level}!</strong>
-    </div>
-    <div class="result-text" style="margin-top: 10px;">
-        Easy: {easy_correct}/{easy_total}  
-        Medium: {medium_correct}/{medium_total}  
-        Hard: {hard_correct}/{hard_total}
-    </div>
-    <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.3); border-radius: 10px;">
-        <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">🤖 ML Insights:</div>
-        <div style="font-size: 13px; margin-bottom: 5px;">{difficulty_trend}</div>
-        <div style="font-size: 13px; color: #555;"><strong>Next Steps:</strong> {next_steps}</div>
-    </div>
-</div>
-""",
-            unsafe_allow_html=True,
-        )
-        
-        # Show improvement over attempts
-        if username != 'guest':
-            attempts = DataManager.get_user_progress(username).get('lesson_quizzes', {}).get(selected_key, {}).get('attempts', 1)
-            best_score = DataManager.get_user_progress(username).get('lesson_quizzes', {}).get(selected_key, {}).get('best_score_pct', pct)
-            if attempts > 1:
-                if pct > best_score - 10:
-                    st.success(f"📊 **Progress Tracking:** This is attempt #{attempts}. Best score: {best_score}%")
-                if pct == best_score and pct >= 80:
-                    st.balloons()
-                    st.success("🎉 **New Personal Best!** You're mastering this lesson!")
-                elif pct > best_score:
-                    st.success(f"🎉 **Improvement!** You scored {pct - best_score}% better than your previous best!")
-        
-        for idx, q in enumerate(questions, start=1):
-            picked = answers.get(q["id"])
-            picked_index = q["choices"].index(picked) if picked in q["choices"] else None
-            is_correct = picked_index == q["answer"]
+            # Grade quiz
+            correct = 0
+            easy_correct = 0
+            medium_correct = 0
+            hard_correct = 0
+            easy_total = 0
+            medium_total = 0
+            hard_total = 0
             
-            css_class = (
-                "per-question-correct" if is_correct else "per-question-wrong"
-            )
-            label = "Correct" if is_correct else "Check this one again"
+            for idx, q in enumerate(selected_questions, 1):
+                user_answer = answers[idx]
+                is_correct = q['choices'].index(user_answer) == q['answer']
+                
+                if is_correct:
+                    correct += 1
+                
+                if q['difficulty'] == 'easy':
+                    easy_total += 1
+                    if is_correct:
+                        easy_correct += 1
+                elif q['difficulty'] == 'medium':
+                    medium_total += 1
+                    if is_correct:
+                        medium_correct += 1
+                else:
+                    hard_total += 1
+                    if is_correct:
+                        hard_correct += 1
             
-            st.markdown(
-            f"""
-<div class="per-question-result {css_class}">
-    Question {idx}: {label}
-</div>
-""",
-                unsafe_allow_html=True,
-            )
+            score_pct = int((correct / 10) * 100)
+            
+            # Save to progress
+            if username != 'guest':
+                best_score = max(score_pct, lesson_history.get('best_score_pct', 0))
+                attempts = lesson_history.get('attempts', 0) + 1
+                
+                DataManager.save_quiz_results(
+                    username=username,
+                    quiz_type=lesson_key,
+                    score=correct,
+                    total=10,
+                    weak_topics=[],
+                    strong_topics=[]
+                )
+                
+                # Update with detailed stats
+                progress = DataManager.get_user_progress(username)
+                if 'lesson_quizzes' not in progress:
+                    progress['lesson_quizzes'] = {}
+                progress['lesson_quizzes'][lesson_key] = {
+                    'completed': True,
+                    'score': correct,
+                    'total': 10,
+                    'score_pct': score_pct,
+                    'best_score_pct': best_score,
+                    'attempts': attempts,
+                    'easy': f"{easy_correct}/{easy_total}",
+                    'medium': f"{medium_correct}/{medium_total}",
+                    'hard': f"{hard_correct}/{hard_total}",
+                    'date': datetime.now().isoformat()
+                }
+                DataManager._save_json(DataManager.PROGRESS_FILE, progress)
+            
+            # Show results
+            performance = "🌟 Mastering!" if score_pct >= 80 else "📈 Improving!" if score_pct >= 60 else "📚 Keep Learning!"
+            
+            st.markdown(f"""
+            <div class="result-box">
+                <div class="result-score">{score_pct}%</div>
+                <div class="result-text">
+                    You scored {correct} out of 10 correct
+                </div>
+                <div class="result-text" style="font-size: 24px; font-weight: 700; margin-top: 15px;">
+                    {performance}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Breakdown
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Easy", f"{easy_correct}/{easy_total}", delta=None)
+            with col2:
+                st.metric("Medium", f"{medium_correct}/{medium_total}", delta=None)
+            with col3:
+                st.metric("Hard", f"{hard_correct}/{hard_total}", delta=None)
+            
+            # ML Insights
+            if score_pct >= 80:
+                insight = "🎯 **Excellent!** You're mastering this topic. Keep challenging yourself with advanced problems."
+                next_step = "Try the next lesson or practice more difficult problems."
+            elif score_pct >= 60:
+                insight = "💪 **Good progress!** You understand the fundamentals. Focus on medium and hard questions."
+                next_step = "Review the lesson content and retry for a higher score."
+            else:
+                insight = "📖 **Keep practicing!** Review the lesson material and focus on understanding core concepts."
+                next_step = "Revisit the lesson content, then try again with easier questions."
+            
+            st.markdown(f"""
+            <div style="background: linear-gradient(135deg, rgba(107,142,35,0.2) 0%, rgba(85,107,47,0.2) 100%); 
+                        padding: 20px; border-radius: 12px; border-left: 4px solid #6B8E23; margin: 20px 0;">
+                <div style="font-size: 16px; font-weight: 700; color: #FFFFFF; margin-bottom: 10px;">
+                    🤖 ML Insights
+                </div>
+                <div style="font-size: 14px; color: #E0E0E0; margin-bottom: 8px;">
+                    {insight}
+                </div>
+                <div style="font-size: 14px; color: #B3B3B3;">
+                    <strong>Next Steps:</strong> {next_step}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Show improvement if retaking
+            if username != 'guest' and attempts > 1:
+                if score_pct > lesson_history.get('best_score_pct', 0):
+                    improvement = score_pct - lesson_history.get('best_score_pct', 0)
+                    st.success(f"🎉 **New Personal Best!** You improved by {improvement}%!")
+                elif score_pct == best_score and score_pct >= 80:
+                    st.success(f"🏆 **Consistent Excellence!** Attempt #{attempts} - Best: {best_score}%")
+                else:
+                    st.info(f"📊 Attempt #{attempts} - Your best: {best_score}%")
+            
+            if score_pct == 100:
+                st.balloons()
     
+    # Navigation
     st.markdown("---")
-    col_a, col_b, col_c = st.columns(3)
-    with col_a:
-        if st.button("Back to lessons"):
-            if "current_page" in st.session_state:
-                st.session_state.current_page = "lessons"
-                st.rerun()
-    with col_b:
-        if st.button("Back to home"):
-            if "current_page" in st.session_state:
-                st.session_state.current_page = "dashboard"
-                st.rerun()
-    with col_c:
-        if st.button("Retry quiz", type="primary"):
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("◀️ Back to Lessons"):
+            st.session_state.current_page = "lessons"
             st.rerun()
+    with col2:
+        if st.button("🏠 Dashboard"):
+            st.session_state.current_page = "dashboard"
+            st.rerun()
+    with col3:
+        if st.button("🔄 Retry Quiz"):
+            st.rerun()
+
 
 if __name__ == "__main__":
     main()

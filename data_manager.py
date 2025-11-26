@@ -242,7 +242,7 @@ class DataManager:
         overall = 0
         if quiz_completed:
             overall += 20
-        overall += (lessons_completed / 5) * 60 if lessons_completed > 0 else 0
+        overall += (lessons_completed / 6) * 60 if lessons_completed > 0 else 0
         overall += (practice_done / 10) * 20 if practice_done > 0 else 0
         
         progress[username]["overall_progress"] = int(overall)
@@ -284,7 +284,7 @@ class DataManager:
         overall = 0
         if quiz_completed:
             overall += 20
-        overall += (lessons_completed / 5) * 60 if lessons_completed > 0 else 0
+        overall += (lessons_completed / 6) * 60 if lessons_completed > 0 else 0
         overall += (practice_done / 10) * 20 if practice_done > 0 else 0
         
         progress[username]["overall_progress"] = int(overall)
