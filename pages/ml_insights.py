@@ -254,8 +254,8 @@ def main():
             </div>
             <div style="font-size: 13px; color: #B3B3B3; line-height: 1.8;">
                 <div>• <strong>Algorithm:</strong> Linear Regression</div>
-                <div>• <strong>R² Score:</strong> {prediction['r_squared']:.3f}</div>
-                <div>• <strong>MAE:</strong> {prediction['mae']:.2f}</div>
+                <div>• <strong>R² Score:</strong> {prediction.get('r_squared', 0.0):.3f}</div>
+                <div>• <strong>MAE:</strong> {prediction.get('mae', 0.0):.2f}</div>
                 <div>• <strong>Features Used:</strong></div>
                 <div style="margin-left: 15px; font-size: 12px;">
                     - Quiz scores<br>

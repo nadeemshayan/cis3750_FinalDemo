@@ -361,6 +361,10 @@ def main():
             
             # Save to progress
             if username != 'guest':
+                # Get current lesson history
+                progress = DataManager.get_user_progress(username)
+                lesson_history = progress.get('lesson_quizzes', {}).get(lesson_key, {})
+                
                 best_score = max(score_pct, lesson_history.get('best_score_pct', 0))
                 attempts = lesson_history.get('attempts', 0) + 1
                 
@@ -373,7 +377,7 @@ def main():
                     strong_topics=[]
                 )
                 
-                # Update with detailed stats
+                # Refresh progress after save
                 progress = DataManager.get_user_progress(username)
                 if 'lesson_quizzes' not in progress:
                     progress['lesson_quizzes'] = {}
