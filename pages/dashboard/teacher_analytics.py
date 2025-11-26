@@ -10,20 +10,20 @@ from pathlib import Path
 
 def get_students_by_teacher(teacher_code):
     """Get all students connected to this teacher"""
-    users_file = Path(__file__).parent.parent.parent / "data" / "users.json"
-    with open(users_file, 'r') as f:
-        users = json.load(f)
+    # Use DataManager which supports both Supabase and JSON
+    student_data = DataManager.get_students_by_teacher_code(teacher_code)
     
+    # Format for analytics page (add grade/age_level if missing)
     students = []
-    for username, user_data in users.items():
-        if user_data.get('role') == 'Student':
-            if teacher_code in user_data.get('teacher_codes', []):
-                students.append({
-                    'username': username,
-                    'email': user_data.get('email'),
-                    'grade': user_data.get('grade'),
-                    'age_level': user_data.get('age_level')
-                })
+    for student in student_data:
+        username = student['username']
+        user_data = DataManager.get_user(username)
+        students.append({
+            'username': username,
+            'email': student.get('email', user_data.get('email', '')),
+            'grade': user_data.get('grade', 'N/A'),
+            'age_level': user_data.get('age_level', 'N/A')
+        })
     return students
 
 
