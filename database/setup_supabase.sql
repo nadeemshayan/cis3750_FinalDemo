@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS users (
     share_code TEXT,
     teacher_code TEXT,
     parent_codes JSONB DEFAULT '[]'::jsonb,
-    teacher_codes JSONB DEFAULT '[]'::jsonb
+    teacher_codes JSONB DEFAULT '[]'::jsonb,
+    children JSONB DEFAULT '[]'::jsonb
 );
 
 -- Progress table
