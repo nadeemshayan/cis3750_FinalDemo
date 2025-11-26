@@ -48,6 +48,7 @@ class DataManager:
         """Save data to JSON file"""
         with open(filepath, 'w') as f:
             json.dump(data, f, indent=2)
+        print(f"💾 Saved to {filepath.name} - {len(data)} users")
     
     # --- User Management ---
     
@@ -184,7 +185,10 @@ class DataManager:
         if username not in progress_data:
             DataManager.init_user_progress(username)
             progress_data = DataManager._load_json(PROGRESS_FILE)
-        return progress_data.get(username, {})
+        
+        user_progress = progress_data.get(username, {})
+        print(f"📖 Reading progress for {username}: Overall={user_progress.get('overall_progress', 0)}%, Quiz={user_progress.get('initial_quiz', {}).get('completed', False)}")
+        return user_progress
     
     @staticmethod
     def update_progress(username: str, category: str, data: Dict):
