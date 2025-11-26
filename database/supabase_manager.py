@@ -228,10 +228,11 @@ class SupabaseDataManager:
     # --- Additional Methods (keeping same signatures as original) ---
     
     @staticmethod
-    def save_quiz_results(username: str, score: int, total: int, weak_topics: List[str], strong_topics: List[str]):
-        """Save initial quiz results"""
+    def save_quiz_results(username: str, quiz_type: str, score: int, total: int, weak_topics: List[str], strong_topics: List[str]):
+        """Save quiz results (initial or lesson quiz)"""
         progress = SupabaseDataManager.get_user_progress(username)
-        progress['initial_quiz'] = {
+        
+        quiz_data = {
             "completed": True,
             "score": score,
             "total": total,
@@ -239,11 +240,19 @@ class SupabaseDataManager:
             "strong_topics": strong_topics,
             "date": datetime.now().isoformat()
         }
+        
+        if quiz_type == "initial":
+            progress['initial_quiz'] = quiz_data
+        else:
+            if 'lesson_quizzes' not in progress:
+                progress['lesson_quizzes'] = {}
+            progress['lesson_quizzes'][quiz_type] = quiz_data
+        
         SupabaseDataManager.update_user_progress(username, progress)
     
     @staticmethod
-    def update_lesson_progress(username: str, lesson_id: str, completed: bool, time_spent: int):
-        """Update lesson progress"""
+    def save_lesson_progress(username: str, lesson_id: str, completed: bool = False, time_spent: int = 0):
+        """Save lesson progress (matches DataManager API)"""
         progress = SupabaseDataManager.get_user_progress(username)
         if 'lessons' not in progress:
             progress['lessons'] = {}
@@ -255,7 +264,15 @@ class SupabaseDataManager:
             "date": datetime.now().isoformat()
         }
         
+        # Update total time spent
+        progress['total_time_spent'] = progress.get('total_time_spent', 0) + time_spent
+        
         SupabaseDataManager.update_user_progress(username, progress)
+    
+    @staticmethod
+    def update_lesson_progress(username: str, lesson_id: str, completed: bool, time_spent: int):
+        """Update lesson progress (legacy method)"""
+        SupabaseDataManager.save_lesson_progress(username, lesson_id, completed, time_spent)
     
     @staticmethod
     def award_badge(username: str, badge_name: str, description: str):

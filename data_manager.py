@@ -239,6 +239,15 @@ class DataManager:
     @staticmethod
     def save_lesson_progress(username: str, lesson_id: str, completed: bool, time_spent: int):
         """Save lesson completion progress"""
+        # Use Supabase if available
+        if USE_SUPABASE:
+            try:
+                SupabaseDataManager.save_lesson_progress(username, lesson_id, completed, time_spent)
+                print(f"✅ Saved to Supabase: {username} - Lesson {lesson_id}")
+            except Exception as e:
+                print(f"⚠️ Supabase save failed: {e}, falling back to JSON")
+        
+        # JSON fallback (always save to JSON too for safety)
         progress = DataManager._load_json(PROGRESS_FILE)
         if username not in progress:
             DataManager.init_user_progress(username)
@@ -256,6 +265,15 @@ class DataManager:
     @staticmethod
     def award_badge(username: str, badge_name: str, badge_description: str):
         """Award a badge to user"""
+        # Use Supabase if available
+        if USE_SUPABASE:
+            try:
+                SupabaseDataManager.award_badge(username, badge_name, badge_description)
+                print(f"✅ Saved to Supabase: {username} - Badge: {badge_name}")
+            except Exception as e:
+                print(f"⚠️ Supabase save failed: {e}, falling back to JSON")
+        
+        # JSON fallback (always save to JSON too for safety)
         progress = DataManager._load_json(PROGRESS_FILE)
         if username not in progress:
             DataManager.init_user_progress(username)
