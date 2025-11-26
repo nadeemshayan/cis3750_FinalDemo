@@ -143,10 +143,10 @@ def render_student_nav():
 
 def render_teacher_nav():
     """Teacher navigation buttons"""
+    # Teacher dashboard shows all student info - no separate page needed
     pages = [
         ("🏠 Dashboard", "dashboard"),
         ("📊 Analytics", "teacher_analytics"),
-        ("👥 Students", "students"),
     ]
     
     current_page = st.session_state.get('current_page', 'dashboard')
