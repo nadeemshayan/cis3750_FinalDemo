@@ -507,7 +507,8 @@ def main():
             if topic not in topic_stats:
                 topic_stats[topic] = {'correct': 0, 'total': 0}
             topic_stats[topic]['total'] += 1
-            if r == q['shuffled_answer']:
+            # Only count as correct if answered AND correct (not if skipped/None)
+            if r is not None and r == q['shuffled_answer']:
                 topic_stats[topic]['correct'] += 1
         
         st.markdown("### 📊 Performance by Topic")
@@ -531,14 +532,18 @@ def main():
                 """, unsafe_allow_html=True)
         
         # ML explanation for topic performance
+        strengths_html = f'<strong style="color: #6B8E23;">Strengths:</strong> {", ".join(strong_found)} - You aced these! We will challenge you with harder questions here.<br>' if strong_found else ''
+        weaknesses_html = f'<strong style="color: #DC3545;">Focus Areas:</strong> {", ".join(weak_found)} - These need work. Our AI will recommend lessons and easier practice questions to build your foundation.' if weak_found else ''
+        neutral_html = 'Your performance is consistent across topics. Keep practicing to improve!' if not (weak_found or strong_found) else ''
+        
         st.markdown(f"""
         <div style="background: linear-gradient(135deg, rgba(107,142,35,0.2) 0%, rgba(85,107,47,0.2) 100%); 
                     padding: 15px; border-radius: 10px; border-left: 4px solid #6B8E23; margin-top: 20px;">
             <div style="font-size: 13px; color: #E0E0E0;">
                 <strong style="color: #FFFFFF;">🤖 ML Analysis of Your Performance:</strong><br>
-                {'<strong style="color: #6B8E23;">Strengths:</strong> ' + ', '.join(strong_found) + ' - You aced these! We will challenge you with harder questions here.<br>' if strong_found else ''}
-                {'<strong style="color: #DC3545;">Focus Areas:</strong> ' + ', '.join(weak_found) + ' - These need work. Our AI will recommend lessons and easier practice questions to build your foundation.' if weak_found else ''}
-                {'' if weak_found or strong_found else 'Your performance is consistent across topics. Keep practicing to improve!'}
+                {strengths_html}
+                {weaknesses_html}
+                {neutral_html}
             </div>
         </div>
         """, unsafe_allow_html=True)
