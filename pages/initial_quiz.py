@@ -380,10 +380,14 @@ def main():
                 if st.button("✅ Submit Quiz", disabled=not submit_enabled, type="primary", use_container_width=True):
                     # Calculate results with shuffled answers
                     correct_count = 0
+                    answered_count = 0
                     for r, q in zip(st.session_state.quiz_responses, st.session_state.shuffled_questions):
-                        if r is not None and r == q["shuffled_answer"]:
-                            correct_count += 1
+                        if r is not None:
+                            answered_count += 1
+                            if r == q["shuffled_answer"]:
+                                correct_count += 1
                     st.session_state.quiz_score = correct_count
+                    print(f"📊 Quiz Submission: Answered={answered_count}/18, Correct={correct_count}/18, Skipped={18-answered_count}")
                 
                     # Store detailed quiz data for feedback page
                     st.session_state.quiz_data = {
@@ -435,6 +439,7 @@ def main():
                             if perf["correct"] / perf["total"] == 1.0]
         
             # Save to database with ML analysis
+            print(f"🎓 Saving initial quiz: {st.session_state.username}, Score: {score}/{total}, Weak: {weak_topics}, Strong: {strong_topics}")
             DataManager.save_quiz_results(
                 st.session_state.username,
                 "initial",
@@ -443,6 +448,7 @@ def main():
                 weak_topics,
                 strong_topics
             )
+            print(f"✅ Initial quiz saved successfully")
         
             # Award badge with explanation
             badge_earned = ""
