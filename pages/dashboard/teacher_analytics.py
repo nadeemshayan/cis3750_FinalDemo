@@ -18,12 +18,25 @@ def get_students_by_teacher(teacher_code):
     for student in student_data:
         username = student['username']
         user_data = DataManager.get_user(username)
-        students.append({
-            'username': username,
-            'email': student.get('email', user_data.get('email', '')),
-            'grade': user_data.get('grade', 'N/A'),
-            'age_level': user_data.get('age_level', 'N/A')
-        })
+        
+        # Handle case where user_data might be None
+        if user_data:
+            students.append({
+                'username': username,
+                'email': student.get('email', user_data.get('email', '')),
+                'grade': user_data.get('grade', 'N/A'),
+                'age_level': user_data.get('age_level', 'N/A')
+            })
+        else:
+            # Use basic data from student_data if user_data is missing
+            students.append({
+                'username': username,
+                'email': student.get('email', 'N/A'),
+                'grade': 'N/A',
+                'age_level': 'N/A'
+            })
+    
+    print(f"📊 Analytics found {len(students)} students for teacher code {teacher_code}: {[s['username'] for s in students]}")
     return students
 
 
