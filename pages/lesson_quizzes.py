@@ -204,11 +204,17 @@ def main():
     
     # Check if coming from a specific lesson
     default_index = 0
+    came_from_lesson = False
     if 'quiz_lesson_id' in st.session_state:
         target_lesson = st.session_state['quiz_lesson_id']
         if target_lesson in lesson_keys:
             default_index = lesson_keys.index(target_lesson)
+            came_from_lesson = True
         del st.session_state['quiz_lesson_id']  # Clear it after use
+    
+    # Show indicator if auto-selected
+    if came_from_lesson:
+        st.success(f"✅ Auto-selected quiz for {LESSONS[lesson_keys[default_index]]['title']}")
     
     selected_title = st.selectbox(
         "**Choose a lesson:**",
