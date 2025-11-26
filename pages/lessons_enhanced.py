@@ -38,7 +38,7 @@ LESSONS = {
         
         This formula captures the essence of derivatives!
         """,
-        "video_url": "https://www.youtube.com/embed/example1",
+        "video_file": "assets/Introduction to Derivatives.mp4",
         "quiz_questions": 3
     },
     "lesson2": {
@@ -69,7 +69,7 @@ LESSONS = {
         - g(x) = x⁷
         - h(x) = 5
         """,
-        "video_url": "https://www.youtube.com/embed/example2",
+        "video_file": "assets/Power_Rule.mp4",
         "quiz_questions": 5
     },
     "lesson3": {
@@ -102,7 +102,7 @@ LESSONS = {
         1. f(x) = x²·sin(x) (product rule needed)
         2. f(x) = x³/(x+1) (quotient rule needed)
         """,
-        "video_url": "https://www.youtube.com/embed/example3",
+        "video_file": "assets/Product_&_Quotient_Rules.mp4",
         "quiz_questions": 5
     },
     "lesson4": {
@@ -136,7 +136,7 @@ LESSONS = {
         - Work from outside to inside
         - Don't forget to multiply by the inner derivative!
         """,
-        "video_url": "https://www.youtube.com/embed/example4",
+        "video_file": "assets/Chain Rule.mp4",
         "quiz_questions": 6
     },
     "lesson5": {
@@ -284,8 +284,16 @@ def render_lesson_view(lesson_id: str):
     
     with tab2:
         st.markdown("### 🎥 Video Lesson")
-        st.info("Video player would be embedded here")
-        # st.video(lesson['video_url'])  # Uncomment with real videos
+        
+        # Display video if available
+        if 'video_file' in lesson and lesson['video_file']:
+            try:
+                st.video(lesson['video_file'])
+                st.caption(f"📹 {lesson['title']} - Video Tutorial")
+            except Exception as e:
+                st.warning(f"Video not available: {lesson.get('video_file', 'No video')}")
+        else:
+            st.info("📹 No video available for this lesson yet")
         
         if st.button("Mark Video as Watched"):
             st.success("Video marked as watched! ✓")
