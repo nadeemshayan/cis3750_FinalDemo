@@ -393,7 +393,8 @@ def main():
                     'hard': f"{hard_correct}/{hard_total}",
                     'date': datetime.now().isoformat()
                 }
-                DataManager._save_json(DataManager.PROGRESS_FILE, progress)
+                # Note: DataManager.save_quiz_results() already saved to database
+                # No need for additional JSON save here
             
             # Show results
             performance = "🌟 Mastering!" if score_pct >= 80 else "📈 Improving!" if score_pct >= 60 else "📚 Keep Learning!"
