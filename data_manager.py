@@ -6,7 +6,8 @@ from typing import Dict, List, Optional, Any
 import hashlib
 
 # Try to use Supabase, fall back to JSON for local dev
-USE_SUPABASE = True
+# TEMPORARILY DISABLED - Supabase manager missing save_quiz_results/save_lesson_progress methods
+USE_SUPABASE = False
 try:
     from database.supabase_manager import SupabaseDataManager
 except:
@@ -246,6 +247,7 @@ class DataManager:
         overall += (practice_done / 10) * 20 if practice_done > 0 else 0
         
         progress[username]["overall_progress"] = int(overall)
+        print(f"📊 Quiz Progress Update: Quiz={quiz_completed}, Lessons={lessons_completed}/6, Practice={practice_done}/10 → Overall={int(overall)}%")
         
         DataManager._save_json(PROGRESS_FILE, progress)
         print(f"✅ Saved to JSON: {username} - Quiz completed: {quiz_data['completed']}")
@@ -288,6 +290,7 @@ class DataManager:
         overall += (practice_done / 10) * 20 if practice_done > 0 else 0
         
         progress[username]["overall_progress"] = int(overall)
+        print(f"📊 Progress Update: Quiz={quiz_completed}, Lessons={lessons_completed}/6, Practice={practice_done}/10 → Overall={int(overall)}%")
         
         DataManager._save_json(PROGRESS_FILE, progress)
     
