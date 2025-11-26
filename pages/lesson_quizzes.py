@@ -134,11 +134,13 @@ def main():
             margin-bottom: 30px;
         }
         .lesson-card {
-            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
-            border-left: 4px solid #6B8E23;
-            padding: 20px;
+            background: linear-gradient(135deg, rgba(107, 142, 35, 0.15) 0%, rgba(107, 142, 35, 0.05) 100%);
+            border: 2px solid rgba(107, 142, 35, 0.4);
+            border-left: 5px solid #6B8E23;
+            padding: 25px;
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
         .question-card {
             background: #2d2d2d;
@@ -230,10 +232,12 @@ def main():
     # Lesson header
     st.markdown(f"""
     <div class="lesson-card">
-        <h2 style="color: {lesson['color']}; margin: 0 0 10px 0;">{lesson['title']}</h2>
-        <p style="color: #B3B3B3; margin: 0;">Topics: {', '.join(lesson['topics'])}</p>
-        <p style="color: #6B8E23; margin: 10px 0 0 0; font-size: 13px;">
-            🤖 <strong>ML-Adaptive:</strong> Questions intelligently selected based on your performance
+        <h2 style="color: #90EE90; margin: 0 0 12px 0; font-weight: 800;">{lesson['title']}</h2>
+        <p style="color: #E0E0E0; margin: 0 0 15px 0; font-size: 15px;">
+            <strong>Topics:</strong> {', '.join(lesson['topics'])}
+        </p>
+        <p style="color: #B8E986; margin: 0; font-size: 14px; line-height: 1.6;">
+            🤖 <strong style="color: #90EE90;">ML-Adaptive Quiz:</strong> This quiz intelligently selects 10 questions based on your performance. Master easy questions to unlock harder ones!
         </p>
     </div>
     """, unsafe_allow_html=True)
