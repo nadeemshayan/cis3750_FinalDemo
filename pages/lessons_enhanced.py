@@ -311,11 +311,25 @@ def render_lesson_view(lesson_id: str):
     
     st.markdown("---")
     
-    # Practice Problems Link
+    # Practice Problems Link with auto-topic selection
     st.info("💡 **Ready to practice?** Test your understanding with practice problems!")
+    
+    # Map lesson to practice topic
+    lesson_to_topic = {
+        "lesson1": "basic_derivatives",
+        "lesson2": "product_quotient",
+        "lesson3": "chain_rule",
+        "lesson4": "trigonometric",
+        "lesson5": "exponential_log",
+        "lesson6": "applications"
+    }
+    
     col_practice1, col_practice2, col_practice3 = st.columns([1, 2, 1])
     with col_practice2:
-        if st.button("🎯 Go to Practice Problems", use_container_width=True):
+        if st.button("🎯 Practice This Topic", use_container_width=True):
+            # Set the practice topic based on current lesson
+            practice_topic = lesson_to_topic.get(lesson_id, "basic_derivatives")
+            st.session_state.practice_topic_id = practice_topic
             st.session_state.current_page = "practice"
             st.rerun()
     

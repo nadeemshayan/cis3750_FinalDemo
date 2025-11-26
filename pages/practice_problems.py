@@ -504,13 +504,39 @@ def main():
             st.session_state.current_page = "lessons"
             st.rerun()
     
+    # Check if coming from a specific lesson
+    came_from_lesson = False
+    auto_topic = None
+    if 'practice_topic_id' in st.session_state:
+        came_from_lesson = True
+        auto_topic = st.session_state['practice_topic_id']
+        del st.session_state['practice_topic_id']  # Clear after use
+    
+    # Show confirmation if auto-selected
+    if came_from_lesson and auto_topic:
+        topic_names = {
+            "basic_derivatives": "Basic Derivatives",
+            "product_quotient": "Product & Quotient Rules",
+            "chain_rule": "Chain Rule",
+            "trigonometric": "Trigonometric Derivatives",
+            "exponential_log": "Exponential & Logarithmic",
+            "applications": "Applications"
+        }
+        topic_display = topic_names.get(auto_topic, auto_topic)
+        st.success(f"✅ Auto-selected practice problems for: **{topic_display}**")
+    
     # Filter options
     col1, col2 = st.columns([2, 1])
     
     with col1:
+        # Auto-select "By Topic" mode if coming from lesson
+        mode_options = ["Recommended for You", "By Topic", "Random Mix", "Review Mistakes"]
+        default_mode_index = 1 if came_from_lesson else 0  # "By Topic" if from lesson
+        
         practice_mode = st.selectbox(
             "Practice Mode",
-            ["Recommended for You", "By Topic", "Random Mix", "Review Mistakes"]
+            mode_options,
+            index=default_mode_index
         )
     
     with col2:
@@ -555,7 +581,18 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     elif practice_mode == "By Topic":
-        topic = st.selectbox("Select Topic", list(PRACTICE_PROBLEMS.keys()))
+        # Auto-select topic if coming from lesson
+        topic_keys = list(PRACTICE_PROBLEMS.keys())
+        default_topic_index = 0
+        
+        if came_from_lesson and auto_topic and auto_topic in topic_keys:
+            default_topic_index = topic_keys.index(auto_topic)
+        
+        topic = st.selectbox(
+            "Select Topic", 
+            topic_keys,
+            index=default_topic_index
+        )
         problems = PRACTICE_PROBLEMS[topic][:num_problems]
         
         # Show ML analysis for this topic
