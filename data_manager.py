@@ -362,6 +362,14 @@ class DataManager:
         Link a student to a teacher's class using teacher code
         Returns: (success: bool, message: str)
         """
+        # Try Supabase first
+        if USE_SUPABASE:
+            try:
+                return SupabaseDataManager.link_student_to_teacher(student_username, teacher_code)
+            except Exception as e:
+                print(f"⚠️ Supabase link failed, falling back to JSON: {e}")
+        
+        # JSON fallback
         users = DataManager._load_json(USERS_FILE)
         
         # Check if student exists

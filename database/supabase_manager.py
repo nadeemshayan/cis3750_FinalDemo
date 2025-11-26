@@ -410,3 +410,49 @@ class SupabaseDataManager:
         except Exception as e:
             print(f"Error linking parent to child: {e}")
             return False, f"Error: {str(e)}"
+    
+    @staticmethod
+    def link_student_to_teacher(student_username: str, teacher_code: str) -> tuple:
+        """
+        Link a student to a teacher's class using teacher code
+        Returns: (success: bool, message: str)
+        """
+        supabase = get_supabase_client()
+        
+        try:
+            # Check if student exists
+            student_response = supabase.table('users').select('*').eq('username', student_username).execute()
+            if not student_response.data:
+                return False, "Student account not found"
+            
+            student_data = student_response.data[0]
+            
+            # Find teacher with this code
+            teacher_response = supabase.table('users').select('*').eq('teacher_code', teacher_code).execute()
+            if not teacher_response.data:
+                return False, f"Teacher with code '{teacher_code}' not found"
+            
+            teacher_data = teacher_response.data[0]
+            teacher_username = teacher_data['username']
+            
+            # Get student's teacher_codes list
+            teacher_codes = student_data.get('teacher_codes', [])
+            if not isinstance(teacher_codes, list):
+                teacher_codes = []
+            
+            # Check if already enrolled
+            if teacher_code in teacher_codes:
+                return False, "Already enrolled in this class"
+            
+            # Add teacher code to student's list
+            teacher_codes.append(teacher_code)
+            supabase.table('users').update({
+                'teacher_codes': teacher_codes
+            }).eq('username', student_username).execute()
+            
+            print(f"✅ Linked {student_username} to teacher {teacher_username} (code: {teacher_code})")
+            return True, f"Successfully joined {teacher_username}'s class!"
+        
+        except Exception as e:
+            print(f"Error linking student to teacher: {e}")
+            return False, f"Error: {str(e)}"
