@@ -104,7 +104,18 @@ def calculate_learning_velocity(username: str) -> Tuple[float, str]:
     
     # Calculate activity level
     lessons_completed = len([l for l in progress.get('lessons', {}).values() if l.get('completed')])
-    days_active = max(1, (datetime.now() - datetime.fromisoformat(progress.get('last_active', datetime.now().isoformat()).split('.')[0])).days)
+    
+    # Handle timezone-aware/naive datetime comparison
+    last_active_str = progress.get('last_active', datetime.now().isoformat())
+    try:
+        last_active = datetime.fromisoformat(last_active_str.replace('Z', '+00:00'))
+        # Make both timezone-naive for comparison
+        if last_active.tzinfo is not None:
+            last_active = last_active.replace(tzinfo=None)
+        days_active = max(1, (datetime.now() - last_active).days)
+    except:
+        days_active = 1  # Default to 1 day if parsing fails
+    
     lessons_per_week = (lessons_completed / days_active) * 7
     
     # ML Velocity Score
