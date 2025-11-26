@@ -456,3 +456,37 @@ class SupabaseDataManager:
         except Exception as e:
             print(f"Error linking student to teacher: {e}")
             return False, f"Error: {str(e)}"
+    
+    @staticmethod
+    def get_students_by_teacher_code(teacher_code: str) -> List[Dict]:
+        """Get students who joined with a teacher's code"""
+        supabase = get_supabase_client()
+        
+        try:
+            # Get all students
+            students_response = supabase.table('users').select('*').eq('role', 'Student').execute()
+            
+            students = []
+            for user in students_response.data:
+                # Check if teacher_code is in student's teacher_codes array
+                teacher_codes = user.get('teacher_codes', [])
+                if not isinstance(teacher_codes, list):
+                    teacher_codes = json.loads(teacher_codes) if teacher_codes else []
+                
+                if teacher_code in teacher_codes:
+                    # Get student's progress
+                    progress_response = supabase.table('progress').select('*').eq('username', user['username']).execute()
+                    progress_data = progress_response.data[0] if progress_response.data else {}
+                    
+                    students.append({
+                        "username": user['username'],
+                        "email": user['email'],
+                        "progress": progress_data.get('overall_progress', 0),
+                        "last_active": progress_data.get('last_active', 'Never')
+                    })
+            
+            return students
+        
+        except Exception as e:
+            print(f"Error getting students by teacher code: {e}")
+            return []

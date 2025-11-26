@@ -474,6 +474,14 @@ class DataManager:
     @staticmethod
     def get_students_by_teacher_code(teacher_code: str) -> List[Dict]:
         """Get students who joined with a teacher's code"""
+        # Try Supabase first
+        if USE_SUPABASE:
+            try:
+                return SupabaseDataManager.get_students_by_teacher_code(teacher_code)
+            except Exception as e:
+                print(f"⚠️ Supabase query failed, falling back to JSON: {e}")
+        
+        # JSON fallback
         users = DataManager._load_json(USERS_FILE)
         progress = DataManager._load_json(PROGRESS_FILE)
         
