@@ -410,12 +410,25 @@ def main():
     
     st.markdown("---")
     
-    # Recommended lesson
+    # ML-Recommended lesson
     recommended = get_recommended_lesson(username)
     showed_recommended = False
     if recommended and recommended not in completed_lessons:
-        st.subheader("🎯 Recommended for You")
-        st.info(f"Based on your quiz results, we recommend: **{LESSONS[recommended]['title']}**")
+        st.markdown("## 🤖 AI-Recommended Lesson")
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #6B8E23 0%, #556B2F 100%); 
+                    padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+            <div style="font-size: 13px; color: #E0E0E0; margin-bottom: 8px;">
+                <strong>🤖 ML Analysis:</strong> Based on your quiz performance in weak topics
+            </div>
+            <div style="font-size: 16px; color: #FFFFFF; font-weight: 600;">
+                ⭐ {LESSONS[recommended]['title']}
+            </div>
+            <div style="font-size: 13px; color: #E0E0E0; margin-top: 5px;">
+                This lesson targets your identified areas for improvement
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
         render_lesson_card(recommended, True, False)
         showed_recommended = True
         st.markdown("---")

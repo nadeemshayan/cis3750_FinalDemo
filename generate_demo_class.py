@@ -106,37 +106,37 @@ def create_demo_student(performance_level='medium'):
     
     # Generate performance data based on level
     if performance_level == 'high':
-        quiz_score = random.randint(7, 8)  # 7-8 out of 8
-        quiz_total = 8
+        quiz_score = random.randint(15, 18)  # 15-18 out of 18
+        quiz_total = 18
         overall_progress = random.randint(70, 95)
         lessons_completed = random.randint(4, 6)
         total_time = random.randint(180, 360)  # 3-6 hours
+        practice_attempts = random.randint(20, 30)
+        practice_correct = int(practice_attempts * random.uniform(0.80, 0.95))
         weak_topics = random.sample(TOPICS, k=random.randint(0, 1))
-        strong_topics = random.sample(TOPICS, k=random.randint(3, 5))
-        practice_attempts = random.randint(15, 30)
-        practice_accuracy = random.uniform(0.75, 0.95)
+        strong_topics = random.sample(TOPICS, k=random.randint(4, 6))
     
     elif performance_level == 'low':
-        quiz_score = random.randint(2, 4)  # 2-4 out of 8
-        quiz_total = 8
+        quiz_score = random.randint(5, 9)  # 5-9 out of 18
+        quiz_total = 18
         overall_progress = random.randint(10, 35)
         lessons_completed = random.randint(0, 2)
         total_time = random.randint(30, 120)  # 30min-2hours
-        weak_topics = random.sample(TOPICS, k=random.randint(3, 5))
-        strong_topics = random.sample(TOPICS, k=random.randint(0, 1))
         practice_attempts = random.randint(3, 10)
-        practice_accuracy = random.uniform(0.25, 0.50)
+        practice_correct = int(practice_attempts * random.uniform(0.30, 0.50))
+        weak_topics = random.sample(TOPICS, k=random.randint(3, 5))
+        strong_topics = random.sample(TOPICS, k=random.randint(0, 2))
     
     else:  # medium
-        quiz_score = random.randint(5, 6)  # 5-6 out of 8
-        quiz_total = 8
+        quiz_score = random.randint(10, 14)  # 10-14 out of 18
+        quiz_total = 18
         overall_progress = random.randint(40, 70)
         lessons_completed = random.randint(2, 4)
         total_time = random.randint(120, 240)  # 2-4 hours
-        weak_topics = random.sample(TOPICS, k=random.randint(1, 3))
-        strong_topics = random.sample(TOPICS, k=random.randint(1, 3))
         practice_attempts = random.randint(10, 20)
-        practice_accuracy = random.uniform(0.50, 0.75)
+        practice_correct = int(practice_attempts * random.uniform(0.60, 0.75))
+        weak_topics = random.sample(TOPICS, k=random.randint(2, 3))
+        strong_topics = random.sample(TOPICS, k=random.randint(2, 4))
     
     # Save quiz results
     DataManager.save_quiz_results(

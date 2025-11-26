@@ -142,7 +142,7 @@ class SupabaseDataManager:
             "initial_quiz": json.dumps({
                 "completed": False,
                 "score": 0,
-                "total": 8,
+                "total": 18,
                 "weak_topics": [],
                 "strong_topics": [],
                 "date": None
@@ -189,7 +189,7 @@ class SupabaseDataManager:
         
         # Return default if not found
         return {
-            "initial_quiz": {"completed": False, "score": 0, "total": 8, "weak_topics": [], "strong_topics": [], "date": None},
+            "initial_quiz": {"completed": False, "score": 0, "total": 18, "weak_topics": [], "strong_topics": [], "date": None},
             "lessons": {},
             "lesson_quizzes": {},
             "practice_problems": {},

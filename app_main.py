@@ -297,6 +297,10 @@ def route_to_page():
         from pages import lesson_quizzes
         lesson_quizzes.main()
     
+    elif page == "ml_insights":
+        from pages import ml_insights
+        ml_insights.main()
+    
     else:
         st.error(f"Page '{page}' not found")
 

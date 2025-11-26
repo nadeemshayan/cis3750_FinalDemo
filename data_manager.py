@@ -149,7 +149,7 @@ class DataManager:
                 "initial_quiz": {
                     "completed": False,
                     "score": 0,
-                    "total": 8,
+                    "total": 18,
                     "weak_topics": [],
                     "strong_topics": [],
                     "date": None
@@ -233,6 +233,20 @@ class DataManager:
         else:
             progress[username]["lesson_quizzes"][quiz_type] = quiz_data
         
+        # Update overall progress
+        quiz_completed = progress[username].get("initial_quiz", {}).get("completed", False)
+        lessons_completed = len([l for l in progress[username].get("lessons", {}).values() if l.get("completed")])
+        practice_done = len(progress[username].get("practice_problems", {}))
+        
+        # Calculate overall progress (quiz 20%, lessons 60%, practice 20%)
+        overall = 0
+        if quiz_completed:
+            overall += 20
+        overall += (lessons_completed / 5) * 60 if lessons_completed > 0 else 0
+        overall += (practice_done / 10) * 20 if practice_done > 0 else 0
+        
+        progress[username]["overall_progress"] = int(overall)
+        
         DataManager._save_json(PROGRESS_FILE, progress)
         print(f"✅ Saved to JSON: {username} - Quiz completed: {quiz_data['completed']}")
     
@@ -260,6 +274,21 @@ class DataManager:
         }
         
         progress[username]["total_time_spent"] += time_spent
+        
+        # Update overall progress
+        quiz_completed = progress[username].get("initial_quiz", {}).get("completed", False)
+        lessons_completed = len([l for l in progress[username].get("lessons", {}).values() if l.get("completed")])
+        practice_done = len(progress[username].get("practice_problems", {}))
+        
+        # Calculate overall progress (quiz 20%, lessons 60%, practice 20%)
+        overall = 0
+        if quiz_completed:
+            overall += 20
+        overall += (lessons_completed / 5) * 60 if lessons_completed > 0 else 0
+        overall += (practice_done / 10) * 20 if practice_done > 0 else 0
+        
+        progress[username]["overall_progress"] = int(overall)
+        
         DataManager._save_json(PROGRESS_FILE, progress)
     
     @staticmethod

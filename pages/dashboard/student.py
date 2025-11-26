@@ -69,7 +69,7 @@ def render():
     
     # Quick Actions
     st.subheader("🚀 Quick Actions")
-    action_col1, action_col2, action_col3 = st.columns(3)
+    action_col1, action_col2, action_col3, action_col4 = st.columns(4)
     
     with action_col1:
         if st.button("📝 Take Initial Quiz" if not quiz_completed else "📝 Retake Quiz", 
@@ -85,6 +85,11 @@ def render():
     with action_col3:
         if st.button("✏️ Practice Problems", use_container_width=True, key="practice_btn"):
             st.session_state.current_page = "practice"
+            st.rerun()
+    
+    with action_col4:
+        if st.button("🤖 ML Insights", use_container_width=True, key="ml_btn", type="primary"):
+            st.session_state.current_page = "ml_insights"
             st.rerun()
     
     st.markdown("---")

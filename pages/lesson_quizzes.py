@@ -13,7 +13,7 @@ def apply_quiz_styles():
     """
 <style>
     [data-testid="stAppViewContainer"] {
-        background-color: #F5FBF8;
+        background-color: #0E1117;
     }
 
     [data-testid="stSidebar"] {
@@ -23,31 +23,34 @@ def apply_quiz_styles():
     .main-header {
         font-size: 48px;
         font-weight: 700;
-        color: #1a1a1a;
+        color: #FFFFFF;
         margin-bottom: 10px;
         line-height: 1.2;
     }
 
     .sub-header {
         font-size: 20px;
-        color: #666;
+        color: #B3B3B3;
         margin-bottom: 30px;
     }
 
     .quiz-card {
-        background-color: white;
+        background-color: #1E1E1E;
         border-radius: 20px;
         padding: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         margin-bottom: 20px;
+        border: 1px solid #2d2d2d;
     }
 
     .quiz-header-card {
         border-radius: 20px;
         padding: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         margin-bottom: 25px;
-        color: #1a1a1a;
+        color: #FFFFFF;
+        background-color: #1E1E1E;
+        border: 1px solid #2d2d2d;
     }
 
     .lesson-badge {
@@ -56,7 +59,8 @@ def apply_quiz_styles():
         border-radius: 14px;
         font-size: 14px;
         font-weight: 600;
-        background-color: white;
+        background-color: #2d2d2d;
+        color: #FFFFFF;
         margin-bottom: 10px;
     }
 
@@ -64,18 +68,19 @@ def apply_quiz_styles():
         font-size: 28px;
         font-weight: 700;
         margin-bottom: 8px;
+        color: #FFFFFF;
     }
 
     .quiz-goal {
         font-size: 16px;
-        color: #444;
+        color: #B3B3B3;
         font-style: italic;
         margin-bottom: 5px;
     }
 
     .quiz-meta {
         font-size: 14px;
-        color: #666;
+        color: #B3B3B3;
     }
 
     .question-header {
@@ -84,7 +89,7 @@ def apply_quiz_styles():
         align-items: center;
         margin-bottom: 10px;
         font-size: 14px;
-        color: #666;
+        color: #B3B3B3;
     }
 
     .difficulty-badge {
@@ -112,29 +117,30 @@ def apply_quiz_styles():
     .question-stem {
         font-size: 17px;
         font-weight: 600;
-        color: #1a1a1a;
+        color: #FFFFFF;
         margin-bottom: 10px;
     }
 
     .result-box {
-        background: linear-gradient(135deg, #D4F4DD 0%, #B8F4D3 100%);
+        background: linear-gradient(135deg, #1a4d2e 0%, #2d5f3f 100%);
         border-radius: 18px;
         padding: 25px;
         margin-top: 20px;
         margin-bottom: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        border: 1px solid #3d7f5f;
     }
 
     .result-score {
         font-size: 40px;
         font-weight: 700;
-        color: #1a1a1a;
+        color: #FFFFFF;
         margin-bottom: 5px;
     }
 
     .result-text {
         font-size: 15px;
-        color: #444;
+        color: #E0E0E0;
     }
 
     .per-question-result {

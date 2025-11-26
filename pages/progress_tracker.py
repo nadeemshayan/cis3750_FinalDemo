@@ -5,20 +5,30 @@ Progress Tracker - Detailed view of user progress across all areas
 import streamlit as st
 from data_manager import DataManager
 import pandas as pd
+from ml_features import (
+    calculate_topic_confidence,
+    get_adaptive_difficulty,
+    calculate_learning_velocity,
+    predict_final_score
+)
 
 
 def main():
     """Main progress tracker page"""
     # Header with home button
-    col1, col2 = st.columns([4, 1])
+    col1, col2, col3 = st.columns([3, 1, 1])
     with col1:
         st.title("📊 My Progress")
     with col2:
+        if st.button("🤖 ML Insights", key="ml_insights_btn", use_container_width=True, type="primary"):
+            st.session_state.current_page = "ml_insights"
+            st.rerun()
+    with col3:
         if st.button("🏠 Home", key="progress_home_btn", use_container_width=True):
             st.session_state.current_page = "dashboard"
             st.rerun()
     
-    st.markdown("Detailed overview of your learning journey")
+    st.markdown("Detailed overview of your learning journey powered by AI")
     
     username = st.session_state.username
     progress = DataManager.get_user_progress(username)
@@ -45,6 +55,36 @@ def main():
     with col4:
         final_completed = progress.get('final_test', {}).get('completed', False)
         st.metric("Final Test", "✅" if final_completed else "⏳")
+    
+    # ML-powered progress analysis
+    velocity, learner_type = calculate_learning_velocity(username)
+    prediction = predict_final_score(username)
+    
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, rgba(107,142,35,0.2) 0%, rgba(85,107,47,0.2) 100%); 
+                padding: 20px; border-radius: 12px; border-left: 4px solid #6B8E23; margin-top: 20px;">
+        <div style="font-size: 16px; font-weight: 600; color: #FFFFFF; margin-bottom: 10px;">
+            🤖 AI-Powered Analysis
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+                <div style="font-size: 13px; color: #B3B3B3;">Learning Type</div>
+                <div style="font-size: 20px; color: #FFFFFF; font-weight: 600;">{learner_type}</div>
+                <div style="font-size: 11px; color: #B3B3B3; margin-top: 3px;">Velocity: {velocity:.1f}/hour</div>
+            </div>
+            <div>
+                <div style="font-size: 13px; color: #B3B3B3;">Predicted Final Score</div>
+                <div style="font-size: 20px; color: #FFFFFF; font-weight: 600;">{prediction['predicted_score']:.1f}%</div>
+                <div style="font-size: 11px; color: #B3B3B3; margin-top: 3px;">Based on ML regression</div>
+            </div>
+        </div>
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="font-size: 12px; color: #E0E0E0;">
+                <strong>💡 Insight:</strong> {prediction['recommendation'][:120]}...
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -76,8 +116,21 @@ def main():
         with weak_col:
             with st.container(border=True):
                 st.markdown("**🎯 Focus Areas:**")
-                for topic in quiz_data.get('weak_topics', []):
-                    st.markdown(f"⚠️ {topic}")
+                weak_topics = quiz_data.get('weak_topics', [])
+                for topic in weak_topics:
+                    # Get ML-calculated confidence for this topic
+                    confidence = calculate_topic_confidence(username, topic)
+                    diff = get_adaptive_difficulty(username, topic)
+                    st.markdown(f"⚠️ {topic} - {confidence}% confidence")
+                
+                if weak_topics:
+                    st.markdown("")
+                    st.markdown(f"""
+                    <div style="background: rgba(220,53,69,0.1); padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 11px; color: #B3B3B3;">
+                        <strong style="color: #FFFFFF;">🤖 ML Recommendation:</strong><br>
+                        These topics need attention. We're recommending targeted practice and easier difficulty questions to rebuild your foundation.
+                    </div>
+                    """, unsafe_allow_html=True)
     else:
         st.info("Take the initial quiz to see your results here!")
     

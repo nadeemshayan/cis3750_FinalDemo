@@ -6,6 +6,7 @@ Tracks attempts and recommends review after 3 incorrect attempts
 import streamlit as st
 from data_manager import DataManager
 import random
+from ml_features import get_review_schedule, get_adaptive_difficulty, calculate_topic_confidence
 
 
 # Practice problem bank organized by topic
@@ -517,13 +518,71 @@ def main():
     
     st.markdown("---")
     
+    # ML-powered spaced repetition info
+    review_schedule = get_review_schedule(username)
+    if review_schedule:
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, rgba(107,142,35,0.2) 0%, rgba(85,107,47,0.2) 100%); 
+                    padding: 15px; border-radius: 10px; border-left: 4px solid #6B8E23; margin-bottom: 20px;">
+            <div style="font-size: 14px; font-weight: 600; color: #FFFFFF; margin-bottom: 8px;">
+                🔄 Spaced Repetition Active
+            </div>
+            <div style="font-size: 12px; color: #E0E0E0;">
+                <strong>🤖 ML Analysis:</strong> {len(review_schedule)} topics need review based on SM-2 algorithm.
+                We're intelligently spacing your practice to maximize long-term retention.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
     # Get problems based on mode
     if practice_mode == "Recommended for You":
         problems = get_problems_for_user(username, num_problems)
-        st.info("🎯 These problems are selected based on your quiz results and learning progress")
+        
+        # Show ML explanation
+        progress = DataManager.get_user_progress(username)
+        weak_topics = progress.get('initial_quiz', {}).get('weak_topics', [])
+        
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, rgba(107,142,35,0.2) 0%, rgba(85,107,47,0.2) 100%); 
+                    padding: 15px; border-radius: 10px; border-left: 4px solid #6B8E23; margin-bottom: 15px;">
+            <div style="font-size: 13px; color: #E0E0E0;">
+                <strong style="color: #FFFFFF;">🤖 Why these problems?</strong><br>
+                {f"• Targeting your weak topics: {', '.join(weak_topics[:3])}<br>" if weak_topics else ""}
+                • Adaptive difficulty based on your performance<br>
+                • Optimized for your learning velocity<br>
+                • Includes review problems from spaced repetition schedule
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     elif practice_mode == "By Topic":
         topic = st.selectbox("Select Topic", list(PRACTICE_PROBLEMS.keys()))
         problems = PRACTICE_PROBLEMS[topic][:num_problems]
+        
+        # Show ML analysis for this topic
+        topic_map = {
+            "basic_derivatives": "Basic Rules",
+            "product_quotient": "Product Rule",
+            "chain_rule": "Chain Rule",
+            "applications": "Applications",
+            "implicit_differentiation": "Implicit Diff.",
+            "trigonometric": "Basic Rules",
+            "exponential_log": "Basic Rules"
+        }
+        mapped_topic = topic_map.get(topic, "Basic Rules")
+        confidence = calculate_topic_confidence(username, mapped_topic)
+        difficulty = get_adaptive_difficulty(username, mapped_topic)
+        
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, rgba(107,142,35,0.2) 0%, rgba(85,107,47,0.2) 100%); 
+                    padding: 15px; border-radius: 10px; border-left: 4px solid #6B8E23; margin-bottom: 15px;">
+            <div style="font-size: 13px; color: #E0E0E0;">
+                <strong style="color: #FFFFFF;">🤖 Topic Analysis:</strong><br>
+                • Current confidence: {confidence}%<br>
+                • Recommended difficulty: {difficulty.upper()}<br>
+                • These problems will help build mastery in this area
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     elif practice_mode == "Review Mistakes":
         # Get problems that need review
         problem_ids = [pid for pid, data in practice_data.items() if data.get('needs_review')]
