@@ -120,7 +120,10 @@ def render_child_report(child_username: str):
     child_data = DataManager.get_user(child_username)
     child_progress = DataManager.get_user_progress(child_username)
     
-    with st.expander(f"👤 {child_username} - Progress Report", expanded=True):
+    # Format child name for display
+    display_name = child_username.replace('_', ' ').title()
+    
+    with st.expander(f"👤 {display_name}'s Progress Report", expanded=True):
         
         # Overview stats
         col1, col2, col3, col4 = st.columns(4)
@@ -236,6 +239,9 @@ def render_lesson_details(progress: dict):
 
 def render_activity_log(username: str, progress: dict):
     """Show recent activity and engagement metrics"""
+    # Format child name for display
+    display_name = username.replace('_', ' ').title()
+    
     last_active = progress.get('last_active', '')
     
     if last_active:
@@ -266,7 +272,7 @@ def render_activity_log(username: str, progress: dict):
             st.info("Activity data not available")
     
     # Engagement metrics
-    st.markdown("### 📈 Engagement Metrics")
+    st.markdown(f"### 📈 {display_name}'s Engagement Metrics")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -286,7 +292,7 @@ def render_activity_log(username: str, progress: dict):
         correct_answers = sum(p.get('correct', 0) for p in practice.values())
         accuracy = round((correct_answers / total_attempts * 100)) if total_attempts > 0 else 0
         
-        st.markdown("### ✏️ Practice Activity")
+        st.markdown(f"### ✏️ {display_name}'s Practice Activity")
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("Problems Attempted", total_attempts)

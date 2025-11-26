@@ -293,6 +293,10 @@ def route_to_page():
         from pages import settings
         settings.main()
     
+    elif page == "lesson_quizzes":
+        from pages import lesson_quizzes
+        lesson_quizzes.main()
+    
     else:
         st.error(f"Page '{page}' not found")
 

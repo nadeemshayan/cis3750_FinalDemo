@@ -7,14 +7,9 @@ import random
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from data_manager import DataManager
 
-st.set_page_config(
-    page_title="Lesson Quizzes",
-    layout="wide",
-    page_icon="🎯",
-    initial_sidebar_state="collapsed",
-)
-
-st.markdown(
+def apply_quiz_styles():
+    """Apply custom styles for lesson quizzes"""
+    st.markdown(
     """
 <style>
     [data-testid="stAppViewContainer"] {
@@ -887,16 +882,20 @@ QUESTION_BANKS = {
     ],
 }
 
-# ------------- header -------------
-
-st.markdown(
-    '<h1 class="main-header">Lesson Quizzes</h1>',
-    unsafe_allow_html=True,
-)
-st.markdown(
-    '<p class="sub-header">Each quiz uses an easy, medium, hard bank for its lesson. You can add more questions to the banks when you need the full sixty.</p>',
-    unsafe_allow_html=True,
-)
+def main():
+    """Main function for lesson quizzes"""
+    apply_quiz_styles()
+    
+    # ------------- header -------------
+    
+    st.markdown(
+        '<h1 class="main-header">Lesson Quizzes</h1>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<p class="sub-header">Each quiz uses an easy, medium, hard bank for its lesson. You can add more questions to the banks when you need the full sixty.</p>',
+        unsafe_allow_html=True,
+    )
 
 lesson_labels = [meta["label"] for meta in LESSON_META.values()]
 lesson_keys = list(LESSON_META.keys())
@@ -1145,10 +1144,11 @@ with col_a:
 with col_b:
     if st.button("Back to home"):
         if "current_page" in st.session_state:
-            st.session_state.current_page = "home"
+            st.session_state.current_page = "dashboard"
             st.rerun()
 with col_c:
-    if st.button("View feedback"):
-        if "current_page" in st.session_state:
-            st.session_state.current_page = "feedback"
-            st.rerun()
+    if st.button("Retry quiz", type="primary"):
+        st.rerun()
+
+if __name__ == "__main__":
+    main()

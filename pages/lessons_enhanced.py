@@ -311,6 +311,16 @@ def render_lesson_view(lesson_id: str):
     
     st.markdown("---")
     
+    # Practice Problems Link
+    st.info("💡 **Ready to practice?** Test your understanding with practice problems!")
+    col_practice1, col_practice2, col_practice3 = st.columns([1, 2, 1])
+    with col_practice2:
+        if st.button("🎯 Go to Practice Problems", use_container_width=True):
+            st.session_state.current_page = "practice"
+            st.rerun()
+    
+    st.markdown("---")
+    
     # Complete lesson button
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
