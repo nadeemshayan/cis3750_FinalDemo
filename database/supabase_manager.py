@@ -92,9 +92,15 @@ class SupabaseDataManager:
         if user["password"] != SupabaseDataManager._hash_password(password):
             return False, None, "Incorrect password"
         
-        # Parse JSON fields
-        user['parent_codes'] = json.loads(user.get('parent_codes', '[]'))
-        user['teacher_codes'] = json.loads(user.get('teacher_codes', '[]'))
+        # Parse JSONB fields (Supabase returns them as objects, not strings)
+        parent_codes = user.get('parent_codes', [])
+        user['parent_codes'] = parent_codes if isinstance(parent_codes, list) else json.loads(parent_codes) if parent_codes else []
+        
+        teacher_codes = user.get('teacher_codes', [])
+        user['teacher_codes'] = teacher_codes if isinstance(teacher_codes, list) else json.loads(teacher_codes) if teacher_codes else []
+        
+        children = user.get('children', [])
+        user['children'] = children if isinstance(children, list) else json.loads(children) if children else []
         
         return True, user, "Login successful"
     
@@ -107,9 +113,16 @@ class SupabaseDataManager:
         
         if response.data:
             user = response.data[0]
-            # Parse JSON fields
-            user['parent_codes'] = json.loads(user.get('parent_codes', '[]'))
-            user['teacher_codes'] = json.loads(user.get('teacher_codes', '[]'))
+            # Parse JSONB fields (Supabase returns them as objects, not strings)
+            parent_codes = user.get('parent_codes', [])
+            user['parent_codes'] = parent_codes if isinstance(parent_codes, list) else json.loads(parent_codes) if parent_codes else []
+            
+            teacher_codes = user.get('teacher_codes', [])
+            user['teacher_codes'] = teacher_codes if isinstance(teacher_codes, list) else json.loads(teacher_codes) if teacher_codes else []
+            
+            children = user.get('children', [])
+            user['children'] = children if isinstance(children, list) else json.loads(children) if children else []
+            
             return user
         return None
     
