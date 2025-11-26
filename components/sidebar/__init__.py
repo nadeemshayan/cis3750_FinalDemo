@@ -88,6 +88,7 @@ def render_sidebar():
         if st.session_state.user_role == "Student":
             progress = DataManager.get_user_progress(st.session_state.username)
             overall_progress = progress.get("overall_progress", 0)
+            print(f"🔍 Sidebar loading progress for {st.session_state.username}: {overall_progress}%")
             st.progress(overall_progress / 100, text=f"Overall Progress: {overall_progress}%")
         elif st.session_state.user_role == "Teacher":
             # Show teacher stats instead

@@ -553,23 +553,28 @@ def main():
             border_color = "#6B8E23" if is_correct else "#DC3545"
         
             with st.expander(f"{status_icon} Question {i}: {q['topic']}" + (" ✓ Correct" if is_correct else " ✗ Incorrect"), expanded=not is_correct):
+                # Get display values to avoid nested f-string issues
+                user_answer = q['choices'][r] if r is not None else '— (No answer selected)'
+                question_text = q['stem']
+                
                 st.markdown(f"""
                 <div style="background: #2d2d2d; border-radius: 12px; padding: 20px; border-left: 4px solid {border_color};">
-                    <div style="font-size: 18px; color: #FFFFFF; margin-bottom: 15px; font-weight: 600;">{q['stem']}</div>
+                    <div style="font-size: 18px; color: #FFFFFF; margin-bottom: 15px; font-weight: 600;">{question_text}</div>
                     <div style="font-size: 14px; margin-bottom: 10px;">
                         <div style="color: #B3B3B3; margin-bottom: 5px;"><b>Your answer:</b></div>
                         <div style="color: {status_color}; font-size: 16px; padding: 10px; background: #1a1a1a; border-radius: 8px; margin-bottom: 10px;">
-                            {q['choices'][r] if r is not None else '— (No answer selected)'}
+                            {user_answer}
                         </div>
                     </div>
                 """, unsafe_allow_html=True)
                 
                 if not is_correct:
+                    correct_answer = q['choices'][q['shuffled_answer']]
                     st.markdown(f"""
                     <div style="font-size: 14px; margin-bottom: 10px;">
                         <div style="color: #B3B3B3; margin-bottom: 5px;"><b>Correct answer:</b></div>
                         <div style="color: #6B8E23; font-size: 16px; padding: 10px; background: #1a1a1a; border-radius: 8px; margin-bottom: 10px;">
-                            {q['choices'][q['shuffled_answer']]}
+                            {correct_answer}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)

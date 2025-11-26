@@ -22,6 +22,7 @@ def render():
     
     # Get user progress
     progress = DataManager.get_user_progress(st.session_state.username)
+    print(f"🔍 Dashboard loading progress for {st.session_state.username}: {progress.get('overall_progress', 0)}%")
     quiz_completed = progress.get('initial_quiz', {}).get('completed', False)
     
     # Top stats - olive green gradients
@@ -120,6 +121,11 @@ def render():
     st.subheader("🔗 Account Connections")
     
     user_data = DataManager.get_user(st.session_state.username)
+    
+    # Check if user_data exists
+    if not user_data:
+        st.error("⚠️ Could not load user data. Please try logging out and back in.")
+        return
     
     # Display share code for parents
     col1, col2 = st.columns(2)
