@@ -553,7 +553,7 @@ def main():
                     <div style="font-size: 14px; margin-bottom: 10px;">
                         <div style="color: #B3B3B3; margin-bottom: 5px;"><b>Your answer:</b></div>
                         <div style="color: {status_color}; font-size: 16px; padding: 10px; background: #1a1a1a; border-radius: 8px; margin-bottom: 10px;">
-                            {q['shuffled_choices'][r] if r is not None else '— (No answer selected)'}
+                            {q['choices'][r] if r is not None else '— (No answer selected)'}
                         </div>
                     </div>
                 """, unsafe_allow_html=True)
@@ -563,7 +563,7 @@ def main():
                     <div style="font-size: 14px; margin-bottom: 10px;">
                         <div style="color: #B3B3B3; margin-bottom: 5px;"><b>Correct answer:</b></div>
                         <div style="color: #6B8E23; font-size: 16px; padding: 10px; background: #1a1a1a; border-radius: 8px; margin-bottom: 10px;">
-                            {q['shuffled_choices'][q['shuffled_answer']]}
+                            {q['choices'][q['shuffled_answer']]}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
