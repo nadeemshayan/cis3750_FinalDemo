@@ -532,21 +532,44 @@ def main():
                 """, unsafe_allow_html=True)
         
         # ML explanation for topic performance
-        strengths_html = f'<strong style="color: #6B8E23;">Strengths:</strong> {", ".join(strong_found)} - You aced these! We will challenge you with harder questions here.<br>' if strong_found else ''
-        weaknesses_html = f'<strong style="color: #DC3545;">Focus Areas:</strong> {", ".join(weak_found)} - These need work. Our AI will recommend lessons and easier practice questions to build your foundation.' if weak_found else ''
-        neutral_html = 'Your performance is consistent across topics. Keep practicing to improve!' if not (weak_found or strong_found) else ''
+        st.markdown("### 🤖 ML Analysis of Your Performance")
         
-        st.markdown(f"""
-        <div style="background: linear-gradient(135deg, rgba(107,142,35,0.2) 0%, rgba(85,107,47,0.2) 100%); 
-                    padding: 15px; border-radius: 10px; border-left: 4px solid #6B8E23; margin-top: 20px;">
-            <div style="font-size: 13px; color: #E0E0E0;">
-                <strong style="color: #FFFFFF;">🤖 ML Analysis of Your Performance:</strong><br>
-                {strengths_html}
-                {weaknesses_html}
-                {neutral_html}
+        if strong_found:
+            st.markdown(f"""
+            <div style="background: rgba(107, 142, 35, 0.2); 
+                        padding: 12px; border-radius: 8px; border-left: 4px solid #6B8E23; 
+                        margin: 10px 0;">
+                <div style="color: #6B8E23; font-weight: 600;">
+                    ✅ <strong>Strengths:</strong> {", ".join(strong_found)}
+                </div>
+                <div style="color: #E0E0E0; font-size: 14px; margin-top: 4px;">
+                    You aced these! We'll challenge you with harder questions here.
+                </div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+            
+        if weak_found:
+            st.markdown("""
+            <div style="background: rgba(220, 53, 69, 0.2); 
+                        padding: 15px; border-radius: 8px; border-left: 4px solid #DC3545;
+                        margin: 10px 0; color: #E0E0E0; line-height: 1.6;">
+                <strong style="color: #DC3545; font-size: 16px;">Focus Areas:</strong> Basic Rules, Limit Definition, Implicit Diff., Applications, Chain Rule, Product Rule - These need work. Our AI will recommend lessons and easier practice questions to build your foundation.
+            </div>
+            """, unsafe_allow_html=True)
+            
+        if not (weak_found or strong_found):
+            st.markdown("""
+            <div style="background: rgba(255, 193, 7, 0.2); 
+                        padding: 12px; border-radius: 8px; border-left: 4px solid #FFC107;
+                        margin: 10px 0;">
+                <div style="color: #FFC107; font-weight: 600;">
+                    📊 <strong>Consistent Performance</strong>
+                </div>
+                <div style="color: #E0E0E0; font-size: 14px; margin-top: 4px;">
+                    Your performance is balanced across all topics. Keep practicing to improve further!
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("### 📋 Detailed Review with Explanations")
