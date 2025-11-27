@@ -549,11 +549,26 @@ def main():
             """, unsafe_allow_html=True)
             
         if weak_found:
-            st.markdown("""
+            topic_order = [
+                "Basic Rules",
+                "Limit Definition",
+                "Implicit Diff.",
+                "Applications",
+                "Chain Rule",
+                "Product Rule"
+            ]
+            ordered_weak = [topic for topic in topic_order if topic in weak_found]
+
+            st.markdown(f"""
             <div style="background: rgba(220, 53, 69, 0.2); 
-                        padding: 15px; border-radius: 8px; border-left: 4px solid #DC3545;
-                        margin: 10px 0; color: #E0E0E0; line-height: 1.6;">
-                <strong style="color: #DC3545; font-size: 16px;">Focus Areas:</strong> Basic Rules, Limit Definition, Implicit Diff., Applications, Chain Rule, Product Rule - These need work. Our AI will recommend lessons and easier practice questions to build your foundation.
+                        padding: 12px; border-radius: 8px; border-left: 4px solid #DC3545;
+                        margin: 10px 0;">
+                <div style="color: #DC3545; font-weight: 600;">
+                    🔍 <strong>Focus Areas:</strong> {", ".join(ordered_weak)}
+                </div>
+                <div style="color: #E0E0E0; font-size: 14px; margin-top: 4px;">
+                    These topics need more work. We'll recommend targeted lessons and practice questions.
+                </div>
             </div>
             """, unsafe_allow_html=True)
             
